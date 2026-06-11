@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Hackathon - Team & Admin Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #131313;
+    --surface2: #1a1a1a;
+    --border: #222222;
+    --accent: #c6f135;
+    --accent-dim: rgba(198,241,53,0.12);
+    --accent-hover: #d8ff4a;
+    --text: #f0f0f0;
+    --text-muted: #666;
+    --text-dim: #999;
+    --red: #ff4d4d;
+    --yellow: #ffd166;
+    --blue: #4d9fff;
+    --radius: 8px;
+    --nav-h: 52px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── GLOBAL NAV ─── */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 20px;
+    gap: 6px;
+    z-index: 1000;
+  }
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    margin-right: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .nav-logo span { color: var(--text); }
+  .nav-link {
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.15s;
+  }
+  .nav-link:hover { color: var(--text); background: var(--surface2); }
+  .nav-link.active { color: var(--text); }
+  .nav-sep { width: 1px; height: 20px; background: var(--border); margin: 0 6px; }
+  .nav-spacer { flex: 1; }
+  .nav-avatar {
+    padding: 4px 10px; font-size: 12px; font-family: 'Space Mono', monospace;
+    color: var(--accent); border: 1px solid var(--border); border-radius: 4px; background: var(--surface2);
+  }
+
+  /* ─── PAGES ─── */
+  .page { display: none; padding-top: var(--nav-h); min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ─── GRID UTILITIES ─── */
+  .admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media(max-width: 900px) { .admin-grid, .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+  .panel-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; margin-bottom: 24px;
+  }
+  .panel-title {
+    font-family: 'Space Mono', monospace; font-size: 14px;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .control-group { margin-bottom: 16px; }
+  .control-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 6px; letter-spacing: 0.05em; }
+  .input-field {
+    width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px; font-family: inherit; font-size: 13px; outline: none;
+  }
+  .input-field:focus { border-color: var(--accent); }
+  
+  .form-submit {
+    width: 100%; padding: 12px; background: var(--accent); color: #000; border: none;
+    border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.15s;
+    font-family: 'Space Mono', monospace; text-transform: uppercase; margin-top: 8px;
+  }
+  .form-submit:hover { background: var(--accent-hover); }
+
+  .btn-action {
+    padding: 10px 16px; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-action:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-accent-sm {
+    padding: 8px 14px; background: var(--accent); color: #000; border: none;
+    border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .btn-accent-sm:hover { background: var(--accent-hover); }
+
+  .error-message {
+    color: var(--red); font-size: 12px; margin-bottom: 12px; display: none;
+    font-family: 'Space Mono', monospace; padding: 10px; background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.2); border-radius: 4px;
+  }
+  .success-message {
+    color: var(--accent); font-size: 12px; margin-bottom: 12px; display: none;
+    font-family: 'Space Mono', monospace; padding: 10px; background: var(--accent-dim); border: 1px solid rgba(198,241,53,0.2); border-radius: 4px;
+  }
+
+  .stat-block {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 14px; border-radius: 6px; text-align: center;
+  }
+  .stat-value { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; color: #fff; margin-top: 4px; }
+
+  /* ─── MEMBER DIRECTORY CARD LAYOUT ─── */
+  .member-list { display: flex; flex-direction: column; gap: 12px; }
+  .member-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 16px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .member-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* Tags */
+  .tag {
+    padding: 4px 10px; border-radius: 3px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .tag-green { background: rgba(198,241,53,0.12); color: var(--accent); border: 1px solid rgba(198,241,53,0.3); }
+  .tag-red { background: rgba(255,77,77,0.12); color: var(--red); border: 1px solid rgba(255,77,77,0.3); }
+  .tag-blue { background: rgba(77,159,255,0.12); color: var(--blue); border: 1px solid rgba(77,159,255,0.3); }
+
+  /* ─── DUAL TERMINAL LAYOUT ─── */
+  .login-container {
+    max-width: 950px; margin: 40px auto; padding: 0 20px;
+    display: grid; grid-template-columns: 1fr 1.1fr; gap: 32px;
+  }
+  @media (max-width: 768px) { .login-container { grid-template-columns: 1fr; } }
+  
+  .info-brand-panel { display: flex; flex-direction: column; justify-content: center; }
+  .hero-title {
+    font-family: 'Space Mono', monospace; font-size: 44px; font-weight: 700;
+    line-height: 1.0; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .hero-title .accent { color: var(--accent); }
+
+  /* ─── CODESMITH WORKSPACE HACKER LAYER ─── */
+  .countdown-banner {
+    background: var(--surface); border: 1px solid var(--border); padding: 20px;
+    border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+  }
+  .broadcast-banner {
+    background: var(--accent-dim); border: 1px solid rgba(198,241,53,0.3);
+    padding: 16px; border-radius: var(--radius); margin-bottom: 24px; display: none;
+  }
+  .broadcast-banner.active { display: block; }
+
+  .sandbox-workspace { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+  @media(max-width: 1024px) { .sandbox-workspace { grid-template-columns: 1fr; } }
+  
+  .editor-column {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); display: flex; flex-direction: column; height: 450px;
+  }
+  .editor-header {
+    background: var(--surface2); padding: 10px 16px; border-bottom: 1px solid var(--border);
+    font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--text-dim);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .editor-header span { color: var(--accent); }
+  .code-area {
+    flex: 1; width: 100%; background: #0d0d0d; color: #a6e22e; border: none;
+    padding: 16px; font-family: 'Space Mono', monospace; font-size: 12px; resize: none;
+    outline: none; line-height: 1.6; tab-size: 4;
+  }
+
+  /* Data Lists */
+  .data-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+  .data-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .member-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .member-pill {
+    background: var(--surface); border: 1px solid var(--border); font-size: 11px;
+    padding: 4px 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px;
+  }
+  .member-pill span { color: var(--red); cursor: pointer; font-weight: bold; font-size: 12px; }
+
+  /* New Member Matrix Grid */
+  .matrix-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+  .matrix-table th { background: var(--surface2); text-align: left; padding: 10px; color: var(--accent); font-family: 'Space Mono'; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .matrix-table td { padding: 10px; border-bottom: 1px solid var(--border); color: var(--text-dim); }
+  .matrix-table tr:hover td { color: #fff; background: rgba(255,255,255,0.02); }
+
+  /* ─── MODAL DIALOG POPUPS ─── */
+  .dialog-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .dialog-overlay.active { display: flex; }
+  .dialog-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 32px; width: 100%; max-width: 440px; text-align: center;
+  }
+  .dialog-title-text { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; }
+  .dialog-body-text { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+  .dialog-actions { display: flex; gap: 12px; justify-content: center; }
+
+  .thanks-layout {
+    max-width: 500px; margin: 80px auto; text-align: center;
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 48px; border-radius: 12px;
+  }
+  .thanks-icon { font-size: 48px; color: var(--accent); margin-bottom: 16px; }
+  .zip-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 10px 14px; border-radius: 6px; margin-bottom: 8px;
+    font-family: 'Space Mono', monospace; font-size: 12px;
+  }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; }
+  .mt-16 { margin-top: 16px; }
+  .mb-16 { margin-bottom: 16px; }
+  .text-accent { color: var(--accent); }
+  .mono { font-family: 'Space Mono', monospace; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo" id="adminPortalTrigger" title="Click to launch Admin Verification Node">DESIGN<br><span>HACKATHON</span></div>
+  <div class="nav-sep"></div>
+  <div class="nav-link active" id="nav-home" onclick="navigate('landing')">Home Gate</div>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar" id="current-user-avatar">👤 Guest Node</div>
+</nav>
+
+<div id="page-landing" class="page active">
+  <div class="login-container">
+    
+    <div class="info-brand-panel">
+      <div class="hero-title">INDORE<br><span class="accent">REGIONAL</span><br>GATEWAY</div>
+      <p style="color: var(--text-dim); margin-bottom: 16px; line-height: 1.6;">
+        Verify your active team shell or credentials to safely mount your secure workspace terminal directory.
+      </p>
+      <div style="background: var(--surface); border: 1px solid var(--border); padding: 14px; border-radius: 6px;">
+        <span style="color: var(--accent); font-family: 'Space Mono'; font-size: 11px; display: block; margin-bottom: 6px;">LIVE ACTIVE ADMINISTRATIVE POOL:</span>
+        <div id="studentHelpLookupList" style="font-size: 12px; font-family: 'Space Mono'; color: var(--text-dim); max-height: 130px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;">
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card" style="margin: 0;">
+      <div class="panel-title">Student Entry Gate</div>
+      <div class="error-message" id="studentLoginError"></div>
+      
+      <div class="control-group">
+        <label class="control-label">Team Designation / ID</label>
+        <input type="text" id="studTeamNo" class="input-field mono" placeholder="e.g., Team 1 or Cyber Wolves">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Unique Event ID Token</label>
+        <input type="text" id="studEventId" class="input-field mono" placeholder="5-Digit Verification Code" maxlength="5">
+      </div>
+
+      <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 14px;">
+        <label class="control-label" style="color: var(--accent); margin-bottom: 10px;">Roster Verification Payload (Exact 3 Members)</label>
+        <div class="control-group" style="margin-bottom: 8px;">
+          <input type="text" id="studM1" class="input-field" placeholder="Member 1 Full Name">
+        </div>
+        <div class="control-group" style="margin-bottom: 8px;">
+          <input type="text" id="studM2" class="input-field" placeholder="Member 2 Full Name">
+        </div>
+        <div class="control-group">
+          <input type="text" id="studM3" class="input-field" placeholder="Member 3 Full Name">
+        </div>
+      </div>
+
+      <button class="form-submit" onclick="attemptStudentLogin()">Authenticate and Mount Terminal →</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="page-admin-auth" class="page">
+  <div style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - var(--nav-h)); padding: 20px;">
+    <div class="panel-card" style="width: 100%; max-width: 400px; margin: 0;">
+      <div class="panel-title">Administrative Identification</div>
+      <div class="error-message" id="authError">Access Denied: Invalid credentials.</div>
+      <div class="control-group">
+        <label class="control-label">Username ID</label>
+        <input type="text" id="adminUser" class="input-field" placeholder="e.g., naman">
+      </div>
+      <div class="control-group">
+        <label class="control-label">Secure Signature Email</label>
+        <input type="email" id="adminEmail" class="input-field" placeholder="name@domain.com">
+      </div>
+      <button class="form-submit" onclick="attemptAdminAccess()">Verify Identity & Boot Suite</button>
+    </div>
+  </div>
+</div>
+
+<div id="page-admin-dashboard" class="page">
+  <div style="padding: 32px; max-width: 1200px; margin: 0 auto;">
+    <div class="flex-between" style="margin-bottom: 24px;">
+      <div>
+        <div style="font-size: 11px; color: var(--accent); font-family: 'Space Mono'; letter-spacing: 0.05em;">INDORE CLUSTER PLATFORM LAYER</div>
+        <h2 id="admin-banner-title" style="font-family: 'Space Mono'; text-transform: uppercase;">Administrative Suite</h2>
+      </div>
+      <button class="btn-action" style="color: var(--red); border-color: var(--red);" onclick="logoutAdmin()">Secure Exit</button>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-title">Platform Roster Metrics</div>
+      <div class="grid-4">
+        <div class="stat-block">
+          <label class="control-label">Registered Shells</label>
+          <div class="stat-value" id="statTotalTeams">2</div>
+        </div>
+        <div class="stat-block">
+          <label class="control-label">Tracked Hackers</label>
+          <div class="stat-value" id="statTotalHackers">6</div>
+        </div>
+        <div class="stat-block">
+          <label class="control-label" style="color: var(--accent);">Ready Vectors (Exact 3)</label>
+          <div class="stat-value" style="color: var(--accent);" id="statReadyTeams">2</div>
+        </div>
+        <div class="stat-block">
+          <label class="control-label" style="color: var(--yellow);">Incomplete Shells</label>
+          <div class="stat-value" style="color: var(--yellow);" id="statPendingTeams">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card" id="admin-team-auth-section">
+      <div class="panel-title" style="margin-bottom: 4px;">
+        <span>Indore Region Auth Verification Gate</span>
+        <span class="tag tag-blue" id="auth-status-badge">Awaiting Input</span>
+      </div>
+      <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">
+        Test local matrix inputs or parse active structural configurations before committing entries directly into the live sandbox database.
+      </p>
+
+      <div class="error-message" id="auth-error-msg"></div>
+      <div class="success-message" id="auth-success-msg"></div>
+
+      <form id="team-auth-form" onsubmit="handleRegionalTeamAuthentication(event)">
+        <div class="grid-2">
+          <div class="control-group">
+            <label class="control-label">Team Designation / Identifier</label>
+            <input type="text" id="auth-team-designation" class="input-field mono" placeholder="e.g., Team 3" required />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Unique Event ID Token</label>
+            <input type="text" id="auth-event-token" class="input-field mono" placeholder="5-Digit Code Token" maxlength="5" required />
+          </div>
+        </div>
+
+        <div class="control-group mt-16" style="border-top: 1px solid var(--border); padding-top: 16px;">
+          <div class="flex-between mb-16">
+            <label class="control-label" style="margin: 0;">Roster Payload Configurations <span class="text-accent">(Exact 3 Members Mapping)</span></label>
+            <span class="mono" style="font-size: 11px; color: var(--text-muted);" id="roster-count-lbl">0 / 3 Verified</span>
+          </div>
+          
+          <div class="member-list" id="auth-roster-payload-container">
+            <div class="member-card">
+              <div class="member-avatar">M1</div>
+              <div class="grid-3" style="width: 100%;">
+                <input type="text" class="input-field roster-name" placeholder="Member 1 Full Name" required />
+                <input type="text" class="input-field roster-link" placeholder="Context Link (Optional)">
+                <select class="input-field roster-role" style="background: var(--surface); color: var(--text-dim);">
+                  <option>Team Lead</option>
+                  <option>Developer</option>
+                  <option>Designer</option>
+                </select>
+              </div>
+            </div>
+            <div class="member-card">
+              <div class="member-avatar">M2</div>
+              <div class="grid-3" style="width: 100%;">
+                <input type="text" class="input-field roster-name" placeholder="Member 2 Full Name" required />
+                <input type="text" class="input-field roster-link" placeholder="Context Link (Optional)">
+                <select class="input-field roster-role" style="background: var(--surface); color: var(--text-dim);">
+                  <option>Developer</option>
+                  <option>Team Lead</option>
+                  <option>Designer</option>
+                </select>
+              </div>
+            </div>
+            <div class="member-card">
+              <div class="member-avatar">M3</div>
+              <div class="grid-3" style="width: 100%;">
+                <input type="text" class="input-field roster-name" placeholder="Member 3 Full Name" required />
+                <input type="text" class="input-field roster-link" placeholder="Context Link (Optional)">
+                <select class="input-field roster-role" style="background: var(--surface); color: var(--text-dim);">
+                  <option>Designer</option>
+                  <option>Team Lead</option>
+                  <option>Developer</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2 mt-16">
+          <button type="button" class="btn-action" style="justify-content: center; font-family:'Space Mono';" onclick="commitAuthPayloadToGlobalRegistry()">
+            📥 Add Team to Global Registry Array
+          </button>
+          <button type="submit" class="form-submit" style="margin: 0; height: 42px;">
+            Test Matching State Loop →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="panel-card" id="member-ledger-section">
+      <div class="panel-title">
+        <span>📋 Registered Member Database Ledger</span>
+        <span class="tag tag-green" id="ledger-count-badge">6 Active Members</span>
+      </div>
+      <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+        A comprehensive database indexing every active participant vector categorized by team and role context.
+      </p>
+      <div style="overflow-x: auto; max-height: 350px; overflow-y: auto; background: #0d0d0d; border: 1px solid var(--border); border-radius: 6px; padding: 8px;">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Hacker Name</th>
+              <th>Assigned Core Role</th>
+              <th>Associated Team Shell</th>
+              <th>Token ID</th>
+              <th>Metadata Link Reference</th>
+            </tr>
+          </thead>
+          <tbody id="memberLedgerTableBody">
+            </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      <div class="panel-card">
+        <div class="panel-title">Dynamic Clock Synchronization</div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+          <button class="btn-action" onclick="adjustGlobalTime(-15)">-15m</button>
+          <button class="btn-action" onclick="adjustGlobalTime(-60)">-1h</button>
+          <div style="font-family: 'Space Mono'; font-size: 24px; font-weight: 700;" id="adminClockDisplay">71:57:39</div>
+          <button class="btn-action" onclick="adjustGlobalTime(60)">+1h</button>
+          <button class="btn-action" onclick="adjustGlobalTime(15)">+15m</button>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-title">Broadcast Release Node</div>
+        <div class="control-group">
+          <textarea id="challengeInput" class="input-field" rows="2" style="resize:none;">Design and assemble a high-performance visual coding dashboard implementing strict no-copy isolation criteria sandbox filters.</textarea>
+        </div>
+        <button class="btn-accent-sm" id="broadcastBtn" onclick="toggleProblemRelease()">Broadcast Problem Statement</button>
+      </div>
+
+      <div class="panel-card" style="grid-column: span 2;">
+        <div class="panel-title">
+          <span>Hacker Shell Deployment Engine</span>
+          <button class="btn-action" onclick="triggerAutoTokenGen()">🎲 Autogenerate Event ID</button>
+        </div>
+        
+        <div class="grid-3" style="margin-bottom: 20px; background: var(--surface2); padding: 16px; border-radius: 6px; border: 1px dashed var(--border);">
+          <div class="control-group" style="margin:0;">
+            <label class="control-label" style="color: var(--accent);">1. Team Designation / Name</label>
+            <input type="text" id="newTeamName" class="input-field" placeholder="e.g., Team 3 or Cipher Squad">
+          </div>
+          <div class="control-group" style="margin:0;">
+            <label class="control-label" style="color: var(--accent);">2. 5-Digit ID Token</label>
+            <input type="text" id="newEventId" class="input-field" placeholder="Click Autogenerate" maxlength="5">
+          </div>
+          <div class="control-group" style="margin:0; display: flex; align-items: flex-end;">
+            <button class="form-submit" style="margin: 0; padding: 10px;" onclick="commitTeamToRegistry()">Deploy Empty Shell</button>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border); padding-top: 16px; margin-bottom: 16px;">
+          <label class="control-label" style="color: var(--yellow);">Allocate Participant to Specific Team Pool Vector</label>
+          <div class="grid-3" style="align-items: flex-end;">
+            <div class="control-group" style="margin:0;">
+              <label class="control-label">Target Destination Matrix</label>
+              <select id="targetTeamSelector" class="input-field" style="background: var(--surface2); color:#fff; border-color: var(--border);"></select>
+            </div>
+            <div class="control-group" style="margin:0;">
+              <label class="control-label">Hacker Full Name</label>
+              <input type="text" id="newMemberName" class="input-field" placeholder="e.g., Jane Watson">
+            </div>
+            <button class="btn-action" style="height: 38px; justify-content: center;" onclick="commitMemberToTeam()">Inject Participant</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <label class="control-label">Active Database Logs Directory</label>
+          <div class="data-list" id="registeredTeamsLog"></div>
+        </div>
+      </div>
+
+      <div class="panel-card" style="grid-column: span 2;">
+        <div class="panel-title">Repository Submissions (.ZIP Vault Archive)</div>
+        <div class="data-list" id="adminZipRepository">
+          <div class="text-muted" style="text-align: center; padding: 20px;">Awaiting secure permanent codebase loop submissions from connected nodes...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-workspace-view" class="page">
+  <div style="padding: 32px; max-width: 1400px; margin: 0 auto;">
+    
+    <div class="countdown-banner">
+      <div>
+        <div style="font-size: 11px; color: var(--text-muted); font-family: 'Space Mono'; text-transform: uppercase;">Time Remaining</div>
+        <div style="font-size: 42px; font-family: 'Space Mono'; font-weight: 700; color: var(--accent);" id="workspaceClockDisplay">71:57:39</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-family: 'Space Mono'; font-weight: bold; color: #fff;" id="activeWorkspaceTeamTag">TEAM: Unauthenticated</div>
+        <div style="font-size: 12px; color: var(--text-muted);" id="activeWorkspaceMembersTag">No active vectors loaded.</div>
+      </div>
+    </div>
+
+    <div class="broadcast-banner" id="hackerProblemBanner">
+      <div style="font-family: 'Space Mono'; font-size: 11px; color: var(--accent);">📢 PROBLEM STATEMENT SPECIFICATION RELEASED:</div>
+      <div id="broadcastMessageText" style="font-size: 15px; font-weight: 500; margin-top: 6px; line-height: 1.6; color: #fff;"></div>
+    </div>
+
+    <div class="flex-between" style="margin-bottom: 12px; align-items: flex-end;">
+      <div>
+        <h3 style="font-family: 'Space Mono', monospace; font-size: 18px;">SANDBOX_WORKSPACE_MAIN_LINE</h3>
+        <p class="text-muted" style="font-size:12px;">Isolated terminal branch active. Context menus and copy/paste triggers are heavily constrained.</p>
+      </div>
+      <button class="btn-accent-sm" style="background: #fff; color: #000; padding: 12px 24px;" onclick="triggerPermanentSubmitDialog()">🚀 Lock Codebase & Build Manifest</button>
+    </div>
+
+    <div class="sandbox-workspace">
+      <div class="editor-column">
+        <div class="editor-header"><div>Document <span>index.html</span></div></div>
+        <textarea class="code-area" id="editorIndex" spellcheck="false">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Design Core Launched Successfully&lt;/h1&gt;
+    &lt;script src="js.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</textarea>
+      </div>
+
+      <div class="editor-column">
+        <div class="editor-header"><div>Styles <span>style.css</span></div></div>
+        <textarea class="code-area" id="editorStyle" spellcheck="false">body {
+    background: #050505;
+    color: #f0f0f0;
+    font-family: sans-serif;
+}</textarea>
+      </div>
+
+      <div class="editor-column">
+        <div class="editor-header"><div>Scripts <span>js.js</span></div></div>
+        <textarea class="code-area" id="editorJs" spellcheck="false">console.log("Isolated execution environment loaded.");</textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="page-thank-you" class="page">
+  <div class="thanks-layout">
+    <div class="thanks-icon">✓</div>
+    <div class="dialog-title-text" style="color: var(--accent);">Commit Log Sealed</div>
+    <p class="dialog-body-text">Your production source code files have been processed, compiled into a repository manifest, and transmitted securely to the admin bank vault.</p>
+    <button class="btn-action" onclick="logoutStudent()">Disconnect Branch Session</button>
+  </div>
+</div>
+
+<div class="dialog-overlay" id="confirmSubmitDialog">
+  <div class="dialog-box">
+    <div class="dialog-title-text" style="color: var(--yellow);">⚠️ Confirm Permanent Commit</div>
+    <p class="dialog-body-text">Are you sure you want to run permanent compilation? This process completely freezes active editors and finishes your track entry sequence.</p>
+    <div class="dialog-actions">
+      <button class="btn-action" onclick="dismissSubmitDialog()">Abort</button>
+      <button class="btn-accent-sm" style="background: var(--red); color: #000;" onclick="executeFinalPublishChain()">Seal Submissions</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let timeInSeconds = 71 * 3600 + 57 * 60 + 39; 
+  let currentTimerInterval = null;
+  let activeAdminUser = null;
+  let authenticatedStudentTeam = null;
+  let isProblemRevealed = false;
+
+  const verifiedSystemAdmins = [
+    { user: 'naman', email: 'naman@gmail.com' },
+    { user: 'palak', email: 'palak@gmail.com' }
+  ];
+
+  // Core System Database - Track objects can include dynamic structural details
+  let systemTeams = [
+    { 
+      id: "11111", 
+      name: "Team 1", 
+      members: ["Aman", "Rohan", "Sonal"],
+      details: [
+        { name: "Aman", role: "Team Lead", link: "internal://node-aman" },
+        { name: "Rohan", role: "Developer", link: "internal://node-rohan" },
+        { name: "Sonal", role: "Designer", link: "internal://node-sonal" }
+      ]
+    },
+    { 
+      id: "22222", 
+      name: "Team 2", 
+      members: ["Karan", "Priya", "Amit"],
+      details: [
+        { name: "Karan", role: "Developer", link: "internal://node-karan" },
+        { name: "Priya", role: "Team Lead", link: "internal://node-priya" },
+        { name: "Amit", role: "Designer", link: "internal://node-amit" }
+      ]
+    }
+  ];
+
+  let loggedSubmissionsZip = [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    setupAdminTrigger();
+    setupNoCopyConstraints();
+    refreshTeamRegistryViews();
+    startGlobalChronometer();
+  });
+
+  function navigate(pageId) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    const targetPage = document.getElementById(`page-${pageId}`);
+    if (targetPage) targetPage.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function setupAdminTrigger() {
+    document.getElementById("adminPortalTrigger").addEventListener("click", () => {
+      if (activeAdminUser) {
+        navigate('admin-dashboard');
+      } else {
+        navigate('admin-auth');
+      }
+    });
+  }
+
+  // ─── CASE-INSENSITIVE STUDENT AUTHENTICATION SYSTEM ───
+  function attemptStudentLogin() {
+    const teamNoVal = document.getElementById("studTeamNo").value.trim().toLowerCase();
+    const eventIdVal = document.getElementById("studEventId").value.trim();
+    const m1 = document.getElementById("studM1").value.trim().toLowerCase();
+    const m2 = document.getElementById("studM2").value.trim().toLowerCase();
+    const m3 = document.getElementById("studM3").value.trim().toLowerCase();
+    const errorBox = document.getElementById("studentLoginError");
+
+    if (!teamNoVal || !eventIdVal || !m1 || !m2 || !m3) {
+      errorBox.innerText = "⚠️ Input Parameter Error: Complete all verification metrics (Requires exactly 3 names).";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    const matchedNode = systemTeams.find(t => {
+      const matchIdentity = (t.name.toLowerCase() === teamNoVal || t.id === teamNoVal);
+      const matchToken = (t.id === eventIdVal);
+      
+      const lowerRoster = t.members.map(m => m.toLowerCase().trim());
+      const matchMembers = lowerRoster.includes(m1) && lowerRoster.includes(m2) && lowerRoster.includes(m3);
+      
+      return matchIdentity && matchToken && matchMembers && t.members.length === 3;
+    });
+
+    if (matchedNode) {
+      errorBox.style.display = "none";
+      authenticatedStudentTeam = matchedNode;
+
+      document.getElementById("activeWorkspaceTeamTag").innerText = `TEAM: ${matchedNode.name.toUpperCase()} (#${matchedNode.id})`;
+      document.getElementById("activeWorkspaceMembersTag").innerText = `Members: ${matchedNode.members.join(', ')}`;
+      document.getElementById("current-user-avatar").innerText = `🚀 ${matchedNode.name}`;
+
+      // Reset
+      document.getElementById("studTeamNo").value = "";
+      document.getElementById("studEventId").value = "";
+      document.getElementById("studM1").value = "";
+      document.getElementById("studM2").value = "";
+      document.getElementById("studM3").value = "";
+
+      navigate('workspace-view');
+    } else {
+      errorBox.innerText = "⚠️ Validation Failed: Roster matrix payload does not match any 3-member team inside the registry block.";
+      errorBox.style.display = "block";
+    }
+  }
+
+  function logoutStudent() {
+    authenticatedStudentTeam = null;
+    document.getElementById("current-user-avatar").innerText = "👤 Guest Node";
+    refreshTeamRegistryViews();
+    navigate('landing');
+  }
+
+  // ─── ADMIN REGIONAL AUTHENTICATION LOOP MATCHER ───
+  function handleRegionalTeamAuthentication(event) {
+    event.preventDefault();
+    
+    const teamDesignation = document.getElementById('auth-team-designation').value.trim().toLowerCase();
+    const eventToken = document.getElementById('auth-event-token').value.trim();
+    const errorMsg = document.getElementById('auth-error-msg');
+    const successMsg = document.getElementById('auth-success-msg');
+    const statusBadge = document.getElementById('auth-status-badge');
+    const rosterCountLbl = document.getElementById('roster-count-lbl');
+
+    const names = Array.from(document.querySelectorAll('#auth-roster-payload-container .roster-name')).map(el => el.value.trim().toLowerCase());
+
+    errorMsg.style.display = 'none';
+    successMsg.style.display = 'none';
+
+    const cleanMatch = systemTeams.find(t => {
+      const designationMatch = (t.name.toLowerCase() === teamDesignation || t.id === teamDesignation);
+      const tokenMatch = (t.id === eventToken);
+      
+      const lowerRegistryMembers = t.members.map(m => m.toLowerCase().trim());
+      const membersMatch = lowerRegistryMembers.includes(names[0]) && lowerRegistryMembers.includes(names[1]) && lowerRegistryMembers.includes(names[2]);
+      
+      return designationMatch && tokenMatch && membersMatch && t.members.length === 3;
+    });
+
+    if (cleanMatch) {
+      statusBadge.textContent = "Authenticated";
+      statusBadge.className = "tag tag-green";
+      rosterCountLbl.textContent = "3 / 3 Matrix Verified";
+      rosterCountLbl.style.color = "var(--accent)";
+      successMsg.innerText = "✓ Match Matrix Confirmed: This combination successfully exists inside the active registry configuration.";
+      successMsg.style.display = "block";
+    } else {
+      statusBadge.textContent = "Rejected";
+      statusBadge.className = "tag tag-red";
+      rosterCountLbl.textContent = "Verification Failed";
+      rosterCountLbl.style.color = "var(--red)";
+      errorMsg.innerText = "⚠️ Validation Failed: Roster matrix payload does not match any 3-member team inside the registry block.";
+      errorMsg.style.display = 'block';
+    }
+  }
+
+  // AUTOMATED REGISTRY MATRIX INJECTION (Updates both sections)
+  function commitAuthPayloadToGlobalRegistry() {
+    const teamDesignation = document.getElementById('auth-team-designation').value.trim();
+    const eventToken = document.getElementById('auth-event-token').value.trim();
+    
+    const nameElements = document.querySelectorAll('#auth-roster-payload-container .member-card');
+    
+    if (!teamDesignation || eventToken.length !== 5 || isNaN(eventToken)) {
+      alert("Registration Error: Please supply a Team Designation and a valid 5-digit numeric ID code.");
+      return;
+    }
+
+    if (systemTeams.some(t => t.id === eventToken)) {
+      alert("Registration Mismatch: That Event Token ID already exists inside the structural memory array.");
+      return;
+    }
+
+    let extractedMembers = [];
+    let extractedDetails = [];
+    let validationPassed = true;
+
+    nameElements.forEach(card => {
+      const name = card.querySelector('.roster-name').value.trim();
+      const link = card.querySelector('.roster-link').value.trim() || "N/A";
+      const role = card.querySelector('.roster-role').value;
+
+      if (!name) {
+        validationPassed = false;
+      } else {
+        extractedMembers.push(name);
+        extractedDetails.push({ name, role, link });
+      }
+    });
+
+    if (!validationPassed || extractedMembers.length !== 3) {
+      alert("Roster Payload Alert: You must fill out all 3 structural student full name blocks to submit.");
+      return;
+    }
+
+    // Push complex structured configuration onto dataset
+    systemTeams.push({
+      id: eventToken,
+      name: teamDesignation,
+      members: extractedMembers,
+      details: extractedDetails
+    });
+
+    alert(`Successfully initialized, packed, and mapped "${teamDesignation}" into the system registry data sections.`);
+    
+    // Clear registration fields
+    document.getElementById('auth-team-designation').value = "";
+    document.getElementById('auth-event-token').value = "";
+    nameElements.forEach(card => {
+      card.querySelector('.roster-name').value = "";
+      card.querySelector('.roster-link').value = "";
+    });
+
+    refreshTeamRegistryViews();
+  }
+
+  // ─── ADMIN CLEARANCE CONSOLE ACCESS ───
+  function attemptAdminAccess() {
+    const userVal = document.getElementById("adminUser").value.trim().toLowerCase();
+    const emailVal = document.getElementById("adminEmail").value.trim().toLowerCase();
+    const errBox = document.getElementById("authError");
+
+    const matchFound = verifiedSystemAdmins.find(admin => admin.user === userVal && admin.email === emailVal);
+
+    if (matchFound) {
+      errBox.style.display = "none";
+      activeAdminUser = matchFound;
+      document.getElementById("admin-banner-title").innerText = `Admin Hub Node: ${matchFound.user.toUpperCase()}`;
+      document.getElementById("current-user-avatar").innerText = `⚙️ Admin: ${matchFound.user.toUpperCase()}`;
+      
+      document.getElementById("adminUser").value = "";
+      document.getElementById("adminEmail").value = "";
+      navigate('admin-dashboard');
+    } else {
+      errBox.style.display = "block";
+    }
+  }
+
+  // ─── TRACK CHRONOMETER SYSTEM ───
+  function startGlobalChronometer() {
+    if(currentTimerInterval) clearInterval(currentTimerInterval);
+    currentTimerInterval = setInterval(() => {
+      if (timeInSeconds > 0) {
+        timeInSeconds--;
+        renderChronometerDisplays();
+      }
+    }, 1000);
+  }
+
+  function adjustGlobalTime(minutesOffset) {
+    timeInSeconds = Math.max(0, timeInSeconds + (minutesOffset * 60));
+    renderChronometerDisplays();
+  }
+
+  function renderChronometerDisplays() {
+    const hrs = Math.floor(timeInSeconds / 3600);
+    const mins = Math.floor((timeInSeconds % 3600) / 60);
+    const secs = timeInSeconds % 60;
+
+    const formatted = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    document.getElementById("adminClockDisplay").innerText = formatted;
+    document.getElementById("workspaceClockDisplay").innerText = formatted;
+  }
+
+  function triggerAutoTokenGen() {
+    document.getElementById("newEventId").value = Math.floor(10000 + Math.random() * 90000);
+  }
+
+  // ─── DYNAMIC REGISTRY REFRESH & LEDGER SYNC MACHINE ───
+  function refreshTeamRegistryViews() {
+    const registryLog = document.getElementById("registeredTeamsLog");
+    const adminSelector = document.getElementById("targetTeamSelector");
+    const helpLookup = document.getElementById("studentHelpLookupList");
+    const ledgerTableBody = document.getElementById("memberLedgerTableBody");
+    
+    registryLog.innerHTML = "";
+    adminSelector.innerHTML = "";
+    helpLookup.innerHTML = "";
+    ledgerTableBody.innerHTML = "";
+
+    let totalHackers = 0;
+    let readyTeamsCount = 0;
+    let pendingTeamsCount = 0;
+
+    systemTeams.forEach((team, index) => {
+      totalHackers += team.members.length;
+      if (team.members.length === 3) readyTeamsCount++;
+      else pendingTeamsCount++;
+
+      // Log Row View 
+      const row = document.createElement("div");
+      row.classList.add("data-item");
+
+      let pills = "";
+      team.members.forEach((m, mIdx) => {
+        pills += `<div class="member-pill">${m} <span onclick="removeMemberNode(${index}, ${mIdx})">×</span></div>`;
+      });
+
+      const memberStatusLabel = team.members.length === 3 
+        ? `<span style="color:var(--accent); font-size:11px;">[Structure Complete]</span>`
+        : `<span style="color:var(--yellow); font-size:11px;">[Missing Node: ${team.members.length}/3]</span>`;
+
+      row.innerHTML = `
+        <div style="flex:1;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <strong style="color:#fff; font-size:14px;">${team.name}</strong>
+            <span style="font-family:'Space Mono'; font-size:11px; color: var(--accent); background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:4px;">ID Token: ${team.id}</span>
+            ${memberStatusLabel}
+          </div>
+          <div class="member-pills">${pills || '<span class="text-muted" style="font-size:11px;">No vectors injected yet.</span>'}</div>
+        </div>
+        <button style="color:var(--red); border:none; background:none; cursor:pointer; font-weight:600;" onclick="removeTeamNode(${index})">Purge</button>
+      `;
+      registryLog.appendChild(row);
+
+      // Selector dropdown population
+      const opt = document.createElement("option");
+      opt.value = index;
+      opt.innerText = `${team.name} (ID: ${team.id})`;
+      adminSelector.appendChild(opt);
+
+      // Help Gateway lists lookup compilation
+      const helpBlock = document.createElement("div");
+      helpBlock.style.fontSize = "11px";
+      helpBlock.style.borderBottom = "1px solid #1e1e1e";
+      helpBlock.style.paddingBottom = "4px";
+      helpBlock.innerHTML = `• <strong>${team.name}</strong> [ID: <span style="color:var(--accent);">${team.id}</span>] — Roster: ${team.members.join(', ') || 'No names bound yet.'}`;
+      helpLookup.appendChild(helpBlock);
+
+      // ─── SYNCED INJECTION INTO NEW COMPREHENSIVE LEDGER SECTION ───
+      if (team.details && team.details.length > 0) {
+        team.details.forEach(detail => {
+          const tableRow = document.createElement("tr");
+          tableRow.innerHTML = `
+            <td style="color:#fff; font-weight:500;">👤 ${detail.name}</td>
+            <td><span class="tag ${detail.role === 'Team Lead' ? 'tag-green' : detail.role === 'Developer' ? 'tag-blue' : 'tag-red'}">${detail.role}</span></td>
+            <td style="font-family:'Space Mono'; font-size:12px;">${team.name}</td>
+            <td style="font-family:'Space Mono'; color:var(--accent); font-size:12px;">${team.id}</td>
+            <td style="font-family:'Space Mono'; font-size:11px; color:var(--text-muted);">${detail.link}</td>
+          `;
+          ledgerTableBody.appendChild(tableRow);
+        });
+      } else {
+        // Fallback reconstruction for raw participant pool additions
+        team.members.forEach((m, idx) => {
+          const tableRow = document.createElement("tr");
+          let inferredRole = idx === 0 ? "Team Lead" : idx === 1 ? "Developer" : "Designer";
+          tableRow.innerHTML = `
+            <td style="color:#fff; font-weight:500;">👤 ${m}</td>
+            <td><span class="tag ${inferredRole === 'Team Lead' ? 'tag-green' : inferredRole === 'Developer' ? 'tag-blue' : 'tag-red'}">${inferredRole}</span></td>
+            <td style="font-family:'Space Mono'; font-size:12px;">${team.name}</td>
+            <td style="font-family:'Space Mono'; color:var(--accent); font-size:12px;">${team.id}</td>
+            <td style="font-family:'Space Mono'; font-size:11px; color:var(--text-muted);">internal://inferred-legacy</td>
+          `;
+          ledgerTableBody.appendChild(tableRow);
+        });
+      }
+    });
+
+    // Update global context state banners
+    document.getElementById("statTotalTeams").innerText = systemTeams.length;
+    document.getElementById("statTotalHackers").innerText = totalHackers;
+    document.getElementById("statReadyTeams").innerText = readyTeamsCount;
+    document.getElementById("statPendingTeams").innerText = pendingTeamsCount;
+    document.getElementById("ledger-count-badge").innerText = `${totalHackers} Active Members`;
+
+    if(systemTeams.length === 0) {
+      helpLookup.innerText = "Registry empty. Log into admin panel to add vector elements.";
+      ledgerTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--text-muted);">Database Empty. No active student profile indices registered.</td></tr>`;
+    }
+  }
+
+  function commitTeamToRegistry() {
+    const nameInput = document.getElementById("newTeamName");
+    const idInput = document.getElementById("newEventId");
+    const name = nameInput.value.trim();
+    const id = idInput.value.trim();
+
+    if(!name || id.length !== 5 || isNaN(id)) {
+      alert("Input Error: Verify the specified designation name and ensure the Event ID contains a 5-digit sequence.");
+      return;
+    }
+    if(systemTeams.some(t => t.id === id)) {
+      alert("Conflict: That structural token assignment already exists.");
+      return;
+    }
+
+    systemTeams.push({ id: id, name: name, members: [], details: [] });
+    nameInput.value = ""; idInput.value = "";
+    refreshTeamRegistryViews();
+  }
+
+  function commitMemberToTeam() {
+    const select = document.getElementById("targetTeamSelector");
+    const input = document.getElementById("newMemberName");
+    const name = input.value.trim();
+
+    if(select.options.length === 0 || !name) return;
+
+    const team = systemTeams[parseInt(select.value)];
+    if(team.members.length >= 3) {
+      alert("Validation Limit: A single dashboard cluster registry track cannot exceed 3 members.");
+      return;
+    }
+
+    let assignedRole = team.members.length === 0 ? "Team Lead" : team.members.length === 1 ? "Developer" : "Designer";
+    team.members.push(name);
+    
+    if(!team.details) team.details = [];
+    team.details.push({ name: name, role: assignedRole, link: "internal://allocated-pool" });
+    
+    input.value = "";
+    refreshTeamRegistryViews();
+  }
+
+  function removeTeamNode(i) { systemTeams.splice(i, 1); refreshTeamRegistryViews(); }
+  function removeMemberNode(ti, mi) { 
+    systemTeams[ti].members.splice(mi, 1); 
+    if(systemTeams[ti].details) systemTeams[ti].details.splice(mi, 1);
+    refreshTeamRegistryViews(); 
+  }
+
+  function logoutAdmin() {
+    activeAdminUser = null;
+    document.getElementById("current-user-avatar").innerText = "👤 Guest Node";
+    refreshTeamRegistryViews();
+    navigate('landing');
+  }
+
+  // ─── BROADCAST SYSTEM HANDLERS ───
+  function toggleProblemRelease() {
+    const promptText = document.getElementById("challengeInput").value.trim();
+    const banner = document.getElementById("hackerProblemBanner");
+    const display = document.getElementById("broadcastMessageText");
+    const btn = document.getElementById("broadcastBtn");
+
+    isProblemRevealed = !isProblemRevealed;
+    if(isProblemRevealed) {
+      display.innerText = promptText;
+      banner.classList.add("active");
+      btn.innerText = "Revoke Broadcast Streams";
+      btn.style.backgroundColor = "var(--red)";
+    } else {
+      banner.classList.remove("active");
+      btn.innerText = "Broadcast Problem Statement";
+      btn.style.backgroundColor = "var(--accent)";
+    }
+  }
+
+  function setupNoCopyConstraints() {
+    document.querySelectorAll('.code-area').forEach(ta => {
+      ta.addEventListener('contextmenu', e => e.preventDefault());
+      ta.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x'].includes(e.key.toLowerCase())) e.preventDefault();
+      });
+    });
+  }
+
+  function triggerPermanentSubmitDialog() { document.getElementById("confirmSubmitDialog").classList.add("active"); }
+  function dismissSubmitDialog() { document.getElementById("confirmSubmitDialog").classList.remove("active"); }
+
+  function executeFinalPublishChain() {
+    dismissSubmitDialog();
+    const htmlSrc = document.getElementById("editorIndex").value;
+    const cssSrc = document.getElementById("editorStyle").value;
+    const tName = authenticatedStudentTeam ? authenticatedStudentTeam.name : "Unknown_Team";
+    const tId = authenticatedStudentTeam ? authenticatedStudentTeam.id : "00000";
+
+    loggedSubmissionsZip.push({
+      fileName: `${tName.replace(/\s+/g, '_')}_ID_${tId}_Build.zip`,
+      time: new Date().toLocaleTimeString(),
+      htmlLength: htmlSrc.length, cssLength: cssSrc.length
+    });
+
+    renderAdminZipRepository();
+    navigate('thank-you');
+  }
+
+  function renderAdminZipRepository() {
+    const container = document.getElementById("adminZipRepository");
+    container.innerHTML = "";
+    if(loggedSubmissionsZip.length === 0) {
+      container.innerHTML = `<div class="text-muted" style="text-align: center; padding: 20px;">Awaiting secure commits...</div>`;
+      return;
+    }
+    loggedSubmissionsZip.forEach(archive => {
+      const element = document.createElement("div");
+      element.classList.add("zip-item");
+      element.innerHTML = `
+        <div>
+          <span style="color: var(--accent); font-weight:bold;">📦 ${archive.fileName}</span>
+          <div style="font-size:10px; color: var(--text-muted);">Transmitted payload at ${archive.time}</div>
+        </div>
+        <button class="btn-accent-sm" style="font-size:11px;" onclick="alert('Downloading compiled repository zip archive package...')">Download Package</button>
+      `;
+      container.appendChild(element);
+    });
+  }
+</script>
+</body>
+</html>
