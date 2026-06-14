@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 
-  /* ═══ CUSTOM CURSOR ═══ */
+  /* ─── CUSTOM CURSOR ─── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
 
   #cursor-dot {
@@ -74,121 +74,59 @@
   }
 
   /* ═══════════════════════════════
-     CURTAIN SYSTEM
-  ═══════════════════════════════ */
+       MINIMAL PRESTIGE REVEAL INTERFACE
+     ═══════════════════════════════ */
   #curtain-overlay {
     position: fixed; inset: 0; z-index: 50000;
-    pointer-events: all; overflow: hidden;
+    pointer-events: all;
+    background: radial-gradient(circle at center, rgba(10, 10, 10, 0.9) 0%, #050505 100%);
+    backdrop-filter: blur(32px) saturate(110%);
+    -webkit-backdrop-filter: blur(32px) saturate(110%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 1.4s cubic-bezier(0.25, 1, 0.5, 1), backdrop-filter 1.4s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: opacity, backdrop-filter;
   }
 
-  .curtain-half {
-    position: absolute; top: 0; bottom: 0; width: 50%;
-    background: #030303;
-    transition: transform 1.2s cubic-bezier(0.76, 0, 0.24, 1);
-    z-index: 50001; overflow: hidden;
-  }
-  .curtain-half.left  { left: 0; }
-  .curtain-half.right { right: 0; }
-
-  /* Fabric fold texture */
-  .curtain-half::before {
-    content: ""; position: absolute; inset: 0;
-    background: repeating-linear-gradient(
-      to right,
-      rgba(255,255,255,0.012) 0px, rgba(0,0,0,0.1) 18px,
-      rgba(255,255,255,0.012) 36px
-    );
-  }
-  .curtain-half::after {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(to bottom, #1c1c1c 0%, #000 15%, #080808 85%, #1c1c1c 100%);
-    mix-blend-mode: multiply;
-  }
-
-  .curtain-sheen {
-    position: absolute; inset: 0; z-index: 2;
-    animation: sheen-breathe 3s ease-in-out infinite alternate;
-  }
-  .curtain-half.left  .curtain-sheen { background: linear-gradient(to right,  rgba(198,241,53,0.07) 0%, transparent 80%); }
-  .curtain-half.right .curtain-sheen { background: linear-gradient(to left, rgba(198,241,53,0.07) 0%, transparent 80%); }
-  @keyframes sheen-breathe { 0% { opacity:.4; } 100% { opacity:1; } }
-
-  /* Curtain rod */
-  .curtain-rod {
-    position: absolute; top: 0; left: 0; right: 0; height: 18px;
-    background: linear-gradient(to bottom, #2a2a2a, #111, #1a1a1a);
-    border-bottom: 2px solid #333; z-index: 50003;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.9);
-  }
-  .curtain-rod::before {
-    content: ""; position: absolute; inset: 0;
-    background: repeating-linear-gradient(
-      to right, transparent 0px, transparent 38px,
-      rgba(198,241,53,0.35) 38px, rgba(198,241,53,0.35) 40px, transparent 40px
-    );
-  }
-  .hook {
-    position: absolute; top: 100%; width: 8px; height: 12px;
-    border: 1.5px solid #555; border-top: none;
-    border-radius: 0 0 4px 4px; background: #222;
-  }
-
-  /* Center ribbon */
-  #ribbon-wrap {
-    position: absolute; inset: 0; z-index: 50002;
-    display: flex; align-items: center; justify-content: center;
+  /* Subtle background design wireframes inside reveal veil */
+  .curtain-wireframe {
+    position: absolute; width: 80%; max-width: 600px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03) 50%, transparent);
     pointer-events: none;
   }
-  #ribbon {
-    display: flex; flex-direction: column; align-items: center;
-    transform: scaleY(1); transform-origin: top center;
-    transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  .wire-top { transform: translateY(-40px); }
+  .wire-bottom { transform: translateY(40px); }
+
+  /* Centered Modern Prompt Geometry */
+  #ribbon-wrap {
+    pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin-bottom: 24px; transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
   }
-  .ribbon-knot {
-    width: 80px; height: 80px; position: relative;
-    display: flex; align-items: center; justify-content: center;
+  
+  .center-node-glyph {
+    width: 32px; height: 32px; border: 1px solid rgba(198, 241, 53, 0.35);
+    transform: rotate(45deg); display: flex; align-items: center; justify-content: center;
+    transition: transform 0.4s ease, border-color 0.4s ease;
   }
-  .ribbon-knot::before, .ribbon-knot::after {
-    content: ""; position: absolute;
-    width: 40px; height: 50px;
-    background: var(--accent); border-radius: 50% 50% 0 0 / 60% 60% 0 0; top: 0;
-  }
-  .ribbon-knot::before { left: 0; transform: rotate(-30deg) translateX(-4px); }
-  .ribbon-knot::after  { right: 0; transform: rotate(30deg) translateX(4px); }
-  .knot-center {
-    position: relative; z-index: 2;
-    width: 28px; height: 28px; background: var(--accent);
-    border-radius: 50%; border: 3px solid #000;
-    animation: knot-pulse 2s ease-in-out infinite;
-  }
-  @keyframes knot-pulse {
-    0%,100% { box-shadow: 0 0 0 2px var(--accent), 0 0 20px rgba(198,241,53,0.8); }
-    50%      { box-shadow: 0 0 0 5px var(--accent), 0 0 50px rgba(198,241,53,0.4), 0 0 90px rgba(198,241,53,0.15); }
-  }
-  .ribbon-tail {
-    width: 6px; height: 110px;
-    background: linear-gradient(to bottom, var(--accent), rgba(198,241,53,0.1));
-    border-radius: 0 0 3px 3px;
+  .center-node-inner {
+    width: 8px; height: 8px; background: var(--accent);
+    box-shadow: 0 0 20px var(--accent);
   }
 
-  /* Tap prompt */
+  /* Soft Ambient Pulsing Interaction Prompt Text */
   #tap-prompt {
-    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
-    z-index: 50004; text-align: center; font-family: 'Space Mono', monospace;
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.18em; color: rgba(198,241,53,0.8);
-    pointer-events: none; animation: prompt-flicker 1.6s ease-in-out infinite;
+    text-align: center; font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 400; text-transform: uppercase;
+    释放-spacing: 0.3em; letter-spacing: 0.3em; color: rgba(245, 245, 245, 0.7);
+    pointer-events: none; transition: opacity 0.4s ease;
+    animation: prompt-soft-glow 3s ease-in-out infinite;
   }
-  #tap-prompt::before { content: "TAP ANYWHERE TO ENTER"; display: block; }
-  #tap-prompt::after  { content: "▼"; display: block; font-size: 15px; margin-top: 6px; animation: bounce-arr 1.6s ease-in-out infinite; }
-  @keyframes prompt-flicker { 0%,100% { opacity:.25; } 50% { opacity:1; } }
-  @keyframes bounce-arr { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+  @keyframes prompt-soft-glow {
+    0%, 100% { opacity: 0.4; transform: scale(0.99); color: rgba(245, 245, 245, 0.5); }
+    50% { opacity: 0.95; transform: scale(1); color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+  }
 
-  /* Open / Gone states */
-  #curtain-overlay.open .curtain-half.left  { transform: translateX(-100%); }
-  #curtain-overlay.open .curtain-half.right { transform: translateX(100%); }
-  #curtain-overlay.open #ribbon { transform: scaleY(0); }
-  #curtain-overlay.open #tap-prompt { opacity:0; transition: opacity .3s; }
+  /* Smooth EMO-Transition Triggers */
+  #curtain-overlay.open { opacity: 0; backdrop-filter: blur(0px) saturate(100%); -webkit-backdrop-filter: blur(0px) saturate(100%); pointer-events: none; }
   #curtain-overlay.gone { display: none !important; }
 
   /* ─── BLUEPRINT CORNERS ─── */
@@ -255,6 +193,7 @@
     max-width: 1240px; margin: 0 auto; padding: 24px 32px;
     display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; position: relative;
     height: 100%; max-height: calc(100vh - var(--nav-h));
+    align-items: center;
   }
   @media(max-width:950px) {
     #page-landing { overflow-y: auto; }
@@ -288,9 +227,7 @@
   .input-field:focus { border-color: var(--accent); background: #0e0e0e; box-shadow: 0 0 12px var(--accent-glow); }
   select.input-field { cursor: none; }
 
-  /* ═══════════════════════════════
-     ANIMATED BUTTONS
-  ═══════════════════════════════ */
+  /* ─── BUTTONS ─── */
   .form-submit {
     width: 100%; padding: 16px; background: var(--accent); color: #000;
     border: 2px solid var(--border-dark); font-family: 'Space Mono', monospace;
@@ -300,7 +237,6 @@
                 box-shadow 0.15s ease, background 0.15s ease, letter-spacing 0.15s ease;
     position: relative; overflow: hidden; margin-top: 12px;
   }
-  /* Inverse colour sweep on hover */
   .form-submit::before {
     content: attr(data-hover);
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -313,23 +249,23 @@
   .form-submit:hover::before { transform: translateY(0); }
   .form-submit:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--border-dark); }
 
-  /* Click ripple */
   @keyframes ripple-out { 0%{ transform:scale(0); opacity:.5; } 100%{ transform:scale(4); opacity:0; } }
   .btn-ripple { position:absolute; width:20px; height:20px; background:rgba(198,241,53,0.45); border-radius:50%; pointer-events:none; z-index:0; transform:translate(-50%,-50%); animation:ripple-out .6s ease-out forwards; }
 
   .btn-action {
     padding: 12px 20px; background: #000; border: 2px solid #222; color: #fff;
     font-size: 11px; font-weight: 700; font-family: 'Space Mono', monospace;
-    text-transform: uppercase; display: inline-flex; align-items: center; gap: 10px;
+    text-transform: uppercase; inline-flex; align-items: center; gap: 10px;
     box-shadow: 3px 3px 0 var(--border-dark);
     transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s ease, border-color 0.15s, color 0.15s, background 0.15s;
     position: relative; overflow: hidden;
+    display: inline-flex;
   }
   .btn-action:hover { border-color: var(--accent); background: #0d0d0d; color: var(--accent); transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--border-dark); }
   .btn-action:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--border-dark); }
 
   .btn-accent-sm {
-    padding: 10px 18px; background: var(--accent); color: #000; border: 2px solid var(--border-dark);
+    padding: 10px 18px; background: var(--accent); color: #000; border: 2px solid #000;
     font-size: 11px; font-weight: 700; font-family: 'Space Mono', monospace; text-transform: uppercase;
     box-shadow: 2px 2px 0 var(--border-dark);
     transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s ease, letter-spacing 0.15s;
@@ -356,7 +292,7 @@
   .node-details ul { list-style: none; color: var(--text-dim); font-size: 12px; }
   .node-details ul li::before { content: "▪ "; color: var(--accent); font-size: 10px; margin-right: 4px; }
 
-  /* ─── ADMIN GRID ─── */
+  /* ─── ADMIN DASHBOARD CONTROLS ─── */
   .admin-dashboard-grid { max-width: 1380px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: repeat(2,1fr); gap: 40px; }
   .span-full { grid-column: span 2; }
   @media(max-width:1050px) { .admin-dashboard-grid { grid-template-columns:1fr; } .span-full { grid-column: span 1; } }
@@ -388,7 +324,7 @@
   .member-list { display: flex; flex-direction: column; gap: 14px; }
   .member-row-card { background: #080808; border: 1px solid #1c1c1c; padding: 18px; display: flex; align-items: center; gap: 20px; }
   .member-index-avatar { width: 36px; height: 36px; background: #111; border: 1px dashed #2a2a2a; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 700; }
-  .inner-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; width: 100%; }
+  .inner-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; }
   @media(max-width:800px) { .inner-grid-3 { grid-template-columns: 1fr; } }
 
   /* ─── WORKSPACE ─── */
@@ -396,7 +332,7 @@
   .countdown-banner { background: var(--surface-card); border: 2px solid var(--border-dark); padding: 28px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; box-shadow: 6px 6px 0px var(--border-dark); position: relative; }
   .broadcast-strip { background: #fff; color: #000; padding: 24px; border: 3px solid #000; margin-bottom: 40px; font-weight: 700; display: none; transform: rotate(-0.2deg); box-shadow: 4px 4px 0 var(--border-dark); }
   .broadcast-strip.active { display: block; }
-  .sandbox-workspace-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 32px; }
+  .sandbox-workspace-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
   @media(max-width:1100px) { .sandbox-workspace-grid { grid-template-columns: 1fr; } }
   .editor-column { background: var(--surface-card); border: 2px solid var(--border-dark); display: flex; flex-direction: column; height: 550px; box-shadow: 4px 4px 0 var(--border-dark); }
   .editor-header { background: #000; padding: 14px 20px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--text-dim); display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1c; }
@@ -421,32 +357,25 @@
 </head>
 <body>
 
-<!-- ══ CURSOR ══ -->
+<!-- ─── CURSOR INFRASTRUCTURE ─── -->
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
 
 <!-- ══════════════════════════════════
-     CURTAIN INTRO
-══════════════════════════════════ -->
+       MINIMAL AMBIENT VEIL (CURTAIN) INTERFACE
+     ══════════════════════════════════ -->
 <div id="curtain-overlay">
-  <div class="curtain-rod">
-    <div class="hook" style="left:8%"></div>  <div class="hook" style="left:18%"></div>
-    <div class="hook" style="left:28%"></div> <div class="hook" style="left:38%"></div>
-    <div class="hook" style="left:62%"></div> <div class="hook" style="left:72%"></div>
-    <div class="hook" style="left:82%"></div> <div class="hook" style="left:92%"></div>
-  </div>
-  <div class="curtain-half left"><div class="curtain-sheen"></div></div>
-  <div class="curtain-half right"><div class="curtain-sheen"></div></div>
+  <div class="curtain-wireframe wire-top"></div>
   <div id="ribbon-wrap">
-    <div id="ribbon">
-      <div class="ribbon-knot"><div class="knot-center"></div></div>
-      <div class="ribbon-tail"></div>
+    <div class="center-node-glyph">
+      <div class="center-node-inner"></div>
     </div>
   </div>
-  <div id="tap-prompt"></div>
+  <div id="tap-prompt">Click anywhere to get started</div>
+  <div class="curtain-wireframe wire-bottom"></div>
 </div>
 
-<!-- ══ NAV ══ -->
+<!-- ─── HEADER SWITCHER BAR ─── -->
 <nav class="nav">
   <div class="nav-logo">REAL IDEAS // REAL IMPACT // <span>DESIGNVERSE</span></div>
   <div class="nav-spacer"></div>
@@ -459,21 +388,15 @@
 
 <!-- ══════════════════════════════════
      PAGE: LANDING
-══════════════════════════════════ -->
+     ══════════════════════════════════ -->
 <div id="page-landing" class="page active">
   <div class="poster-canvas">
 
     <div class="brand-manifesto-panel">
-      <div class="giant-title">DESIGNVERSE<br>2026<br><span class="highlight-block">CAMPUS</span></div>
-      <p style="color:var(--text-dim);margin-bottom:20px;font-size:14px;max-width:480px;line-height:1.65;">
+      <div class="giant-title">DESIGNVERSE<br>2026<br><span class="highlight-block">HACKATHON</span></div>
+      <p style="color:var(--text-dim);margin-bottom:24px;font-size:14px;max-width:480px;line-height:1.65;">
         A 4-day design challenge to solve real-world problems through research, empathy, and creative design thinking.
       </p>
-
-      <div style="background:#000;border:2px solid var(--border-dark);padding:20px;position:relative;box-shadow:4px 4px 0 #0d0d0d;">
-        <div class="blueprint-frame frame-tl"></div>
-        <div class="tape-label" style="background:var(--accent);color:#000;font-size:10px;margin-bottom:12px;transform:rotate(-0.5deg);">CURRENT TEAMS REGISTERED</div>
-        <div id="studentHelpLookupList" style="font-size:12px;font-family:'Space Mono';color:var(--text-dim);max-height:110px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
-      </div>
 
       <div class="journey-timeline-card">
         <div class="tape-label" style="margin-bottom:16px;">4-DAY JOURNEY PROGRAM</div>
@@ -484,7 +407,7 @@
       </div>
     </div>
 
-    <!-- Login card -->
+    <!-- Login Card Container -->
     <div style="height:100%;overflow-y:auto;padding-right:4px;" class="inner-scroll-card">
       <div class="brutalist-card" style="background:#111111;border-width:2px;margin-bottom:0;">
         <div class="tape-strip tape-tl"></div>
@@ -517,7 +440,7 @@
 
 <!-- ══════════════════════════════════
      PAGE: ADMIN AUTH
-══════════════════════════════════ -->
+     ══════════════════════════════════ -->
 <div id="page-admin-auth" class="page">
   <div style="display:flex;justify-content:center;align-items:center;min-height:calc(100vh - var(--nav-h) - 120px);padding:24px;">
     <div class="brutalist-card" style="width:100%;max-width:440px;background:#111111;">
@@ -531,9 +454,7 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     PAGE: ADMIN DASHBOARD
-══════════════════════════════════ -->
+<!-- ─── ADMINISTRATIVE HUB VIEWS ─── -->
 <div id="page-admin-dashboard" class="page">
   <div class="admin-dashboard-grid">
 
@@ -545,18 +466,17 @@
       <button class="btn-action" style="color:var(--red);border-color:var(--red);" onclick="logoutAdmin()">Log Out</button>
     </div>
 
-    <!-- Metrics -->
     <div class="span-full brutalist-card">
       <div class="card-header-mono">Event Attendance &amp; Team Trackers</div>
       <div class="grid-metrics">
         <div class="metric-block"><label class="control-label">Registered Teams</label><div class="metric-value" id="statTotalTeams">2</div></div>
         <div class="metric-block"><label class="control-label">Total Participants</label><div class="metric-value" id="statTotalHackers">6</div></div>
-        <div class="metric-block"><label class="control-label" style="color:var(--accent);">Complete Teams (3 Members)</label><div class="metric-value" style="color:var(--accent);" id="statReadyTeams">2</div></div>
+        <div class="metric-block"><label class="control-label" style="color:var(--accent);">Complete Teams</label><div class="metric-value" style="color:var(--accent);" id="statReadyTeams">2</div></div>
         <div class="metric-block"><label class="control-label" style="color:var(--yellow);">First-Time Logins Active</label><div class="metric-value" style="color:var(--yellow);" id="statFirstLogins">0</div></div>
       </div>
     </div>
 
-    <!-- First-Time Access Monitor -->
+    <!-- First Access Activity Monitors -->
     <div class="span-full brutalist-card" id="admin-first-time-tracking-section">
       <div class="card-header-mono">
         <span>🆕 New Users / First-Time Access Monitoring</span>
@@ -567,7 +487,7 @@
           <label class="control-label" style="margin-bottom:4px;">Search Teams</label>
           <input type="text" id="firstTimeSearchFilter" class="input-field" style="padding:8px 12px;" placeholder="Filter by team identifier name..." oninput="renderFirstTimeAccessLedger()">
         </div>
-        <div style="width:180px;">
+        <div style="width: 180px;">
           <label class="control-label" style="margin-bottom:4px;">Filter Activity Status</label>
           <select id="firstTimeStatusFilter" class="input-field" style="padding:8px 12px;" onchange="renderFirstTimeAccessLedger()">
             <option value="all">All States</option>
@@ -587,7 +507,7 @@
       </div>
     </div>
 
-    <!-- Team Registration Builder with SIZE SELECTOR -->
+    <!-- Team Configuration Setup Form Matrix -->
     <div class="brutalist-card" id="admin-team-auth-section">
       <div class="crosshair-decor" style="top:14px;left:14px;"></div>
       <div class="card-header-mono">
@@ -626,7 +546,7 @@
       </form>
     </div>
 
-    <!-- Attendee Directory -->
+    <!-- Master Ledger Registry Record View -->
     <div class="brutalist-card" id="member-ledger-section">
       <div class="card-header-mono">
         <span>📋 Master Attendee Directory</span>
@@ -640,7 +560,6 @@
       </div>
     </div>
 
-    <!-- Countdown Control -->
     <div class="brutalist-card">
       <div class="card-header-mono">Main Event Countdown Clock Control</div>
       <div style="display:flex;align-items:center;gap:16px;margin-top:12px;background:#000;padding:20px;border:2px solid var(--border-dark);">
@@ -652,7 +571,6 @@
       </div>
     </div>
 
-    <!-- Broadcast -->
     <div class="brutalist-card">
       <div class="card-header-mono">Broadcast Problem Statement to All Teams</div>
       <div class="control-group">
@@ -661,7 +579,6 @@
       <button class="form-submit" data-hover="SEND PROBLEM STATEMENT" id="broadcastBtn" style="margin:0;" onclick="toggleProblemRelease()">Send Problem Statement to Workspace</button>
     </div>
 
-    <!-- Quick Team Creator with SIZE SELECTOR -->
     <div class="span-full brutalist-card">
       <div class="card-header-mono">
         <span>Quick Team Creator Tool</span>
@@ -697,7 +614,6 @@
       </div>
     </div>
 
-    <!-- Submissions Vault -->
     <div class="span-full brutalist-card">
       <div class="card-header-mono">Submitted Solutions Vault (.ZIP Files)</div>
       <div class="data-list" id="adminZipRepository">
@@ -708,9 +624,7 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     PAGE: WORKSPACE
-══════════════════════════════════ -->
+<!-- ─── SANDBOX WORKSPACE SUITE TERMINAL ─── -->
 <div id="page-workspace-view" class="page">
   <div class="workspace-layout-container">
     <div class="countdown-banner">
@@ -768,7 +682,7 @@
   </div>
 </div>
 
-<!-- ══ THANK YOU ══ -->
+<!-- ─── SUBMISSION ACKNOWLEDGMENT TERMINAL ─── -->
 <div id="page-thank-you" class="page">
   <div class="thanks-layout">
     <div style="font-size:72px;color:var(--accent);margin-bottom:20px;font-weight:700;line-height:1;">✓</div>
@@ -778,7 +692,7 @@
   </div>
 </div>
 
-<!-- ══ SUBMIT DIALOG ══ -->
+<!-- ─── CONFIRMATION WINDOW MODALS ─── -->
 <div class="dialog-overlay" id="confirmSubmitDialog">
   <div class="dialog-box">
     <div style="color:var(--yellow);font-size:18px;font-weight:700;">⚠️ Confirm Permanent Solution Submission?</div>
@@ -790,10 +704,10 @@
   </div>
 </div>
 
-
+<!-- ─── APPLICATION LOGIC AND STATE FRAMEWORK ─── -->
 <script>
 /* ══════════════════════════════════════════
-   CURSOR + TRAIL
+   CURSOR + INTERACTIVE MOUSE TRAILS
 ══════════════════════════════════════════ */
 const $dot  = document.getElementById('cursor-dot');
 const $ring = document.getElementById('cursor-ring');
@@ -828,7 +742,6 @@ document.addEventListener('mousemove', e => {
   requestAnimationFrame(animTrails);
 })();
 
-/* Button ripple */
 document.addEventListener('click', e => {
   const btn = e.target.closest('button');
   if (!btn) return;
@@ -843,7 +756,7 @@ document.addEventListener('click', e => {
 });
 
 /* ══════════════════════════════════════════
-   CURTAIN SYSTEM
+   PREMIUM SMOOTH GLASS REVEAL CONTROLLER
 ══════════════════════════════════════════ */
 const curtainEl = document.getElementById('curtain-overlay');
 function openCurtain() {
@@ -854,7 +767,7 @@ curtainEl.addEventListener('click', openCurtain);
 curtainEl.addEventListener('touchstart', openCurtain, { passive: true });
 
 /* ══════════════════════════════════════════
-   APP STATE
+   STATE REGISTRY & ENGINES
 ══════════════════════════════════════════ */
 let timeInSeconds = 71 * 3600 + 57 * 60 + 39;
 let currentTimerInterval = null;
@@ -895,9 +808,6 @@ let systemTeams = [
 ];
 let loggedSubmissionsZip = [];
 
-/* ══════════════════════════════════════════
-   TEAM SIZE CONTROLS
-══════════════════════════════════════════ */
 function setTeamSize(n) {
   currentTeamSize = n;
   document.querySelectorAll('#teamSizeBtns .size-btn').forEach((b, i) => b.classList.toggle('active', [2,3,4,5][i] === n));
@@ -929,18 +839,17 @@ function renderRosterFields() {
   document.getElementById('roster-count-lbl').textContent = `0 / ${currentTeamSize} Added`;
 }
 
-/* Auto-detect login field count from team identifier */
 function detectLoginSize() {
   const val  = document.getElementById('studTeamNo').value.trim().toLowerCase();
-  const code = document.getElementById('studEventId').value.trim();
-  const match = systemTeams.find(t => t.name.toLowerCase() === val || t.id === val || t.id === code);
+  const code = document.getElementById('studEventId').value.trim().toLowerCase();
+  const match = systemTeams.find(t => t.name.toLowerCase() === val || t.id.toLowerCase() === val || t.id.toLowerCase() === code);
   buildLoginFields(match ? match.members.length : 3);
 }
 
 function buildLoginFields(count) {
   const c = document.getElementById('loginMemberFields');
   const lbl = document.getElementById('loginMemberLabel');
-  if (c.querySelectorAll('input').length === count) return; // no rebuild needed
+  if (c.querySelectorAll('input').length === count) return;
   c.innerHTML = '';
   lbl.textContent = `Verify Your Team Members (Enter All ${count} Names)`;
   for (let i = 0; i < count; i++) {
@@ -951,15 +860,13 @@ function buildLoginFields(count) {
   }
 }
 
-/* ══════════════════════════════════════════
-   NAVIGATION
-══════════════════════════════════════════ */
 function navigate(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const t = document.getElementById(`page-${pageId}`);
   if (t) t.classList.add('active');
   window.scrollTo({ top:0, behavior:'smooth' });
 }
+
 function handleWorkspaceTabRouting(portalKey) {
   document.querySelectorAll('.switcher-tab').forEach(b => b.classList.remove('active'));
   if (portalKey === 'admin') {
@@ -971,12 +878,9 @@ function handleWorkspaceTabRouting(portalKey) {
   }
 }
 
-/* ══════════════════════════════════════════
-   STUDENT LOGIN — supports any team size
-══════════════════════════════════════════ */
 function attemptStudentLogin() {
   const teamNoVal  = document.getElementById("studTeamNo").value.trim().toLowerCase();
-  const eventIdVal = document.getElementById("studEventId").value.trim();
+  const eventIdVal = document.getElementById("studEventId").value.trim().toLowerCase();
   const errorBox   = document.getElementById("studentLoginError");
   const memberInputs = Array.from(document.querySelectorAll('#loginMemberFields input'));
   const memberVals = memberInputs.map(el => el.value.trim().toLowerCase());
@@ -987,8 +891,8 @@ function attemptStudentLogin() {
   }
 
   const match = systemTeams.find(t => {
-    const idMatch = t.name.toLowerCase() === teamNoVal || t.id === teamNoVal;
-    const tokenMatch = t.id === eventIdVal;
+    const idMatch = t.name.toLowerCase() === teamNoVal || t.id.toLowerCase() === teamNoVal;
+    const tokenMatch = t.id.toLowerCase() === eventIdVal;
     const roster = t.members.map(m => m.toLowerCase().trim());
     const membersMatch = memberVals.length === t.members.length && memberVals.every(v => roster.includes(v));
     return idMatch && tokenMatch && membersMatch;
@@ -1014,6 +918,7 @@ function attemptStudentLogin() {
     errorBox.style.display = "block";
   }
 }
+
 function logoutStudent() {
   authenticatedStudentTeam = null;
   document.getElementById("current-user-avatar").innerText = "👤 GUEST";
@@ -1021,9 +926,6 @@ function logoutStudent() {
   handleWorkspaceTabRouting('user');
 }
 
-/* ══════════════════════════════════════════
-   FIRST-TIME ACCESS LEDGER
-══════════════════════════════════════════ */
 function renderFirstTimeAccessLedger() {
   const tableBody  = document.getElementById("firstTimeAccessTableBody");
   const searchVal  = (document.getElementById("firstTimeSearchFilter")?.value || "").trim().toLowerCase();
@@ -1037,7 +939,7 @@ function renderFirstTimeAccessLedger() {
     return new Date(b.first_login_timestamp) - new Date(a.first_login_timestamp);
   }).filter(t => {
     const isNew = t.first_login_timestamp === "Awaiting Session...";
-    const matchSearch = t.name.toLowerCase().includes(searchVal) || t.id.includes(searchVal);
+    const matchSearch = t.name.toLowerCase().includes(searchVal) || t.id.toLowerCase().includes(searchVal);
     let matchStatus = true;
     if (statusFilt === "new") matchStatus = isNew;
     if (statusFilt === "active") matchStatus = !isNew;
@@ -1061,23 +963,20 @@ function renderFirstTimeAccessLedger() {
   });
 }
 
-/* ══════════════════════════════════════════
-   TEAM REGISTRATION FORM
-══════════════════════════════════════════ */
 function handleRegionalTeamAuthentication(event) {
   event.preventDefault();
   const teamDesig = document.getElementById('auth-team-designation').value.trim().toLowerCase();
-  const token     = document.getElementById('auth-event-token').value.trim();
+  const token      = document.getElementById('auth-event-token').value.trim().toLowerCase();
   const errorMsg  = document.getElementById('auth-error-msg');
   const successMsg= document.getElementById('auth-success-msg');
-  const badge     = document.getElementById('auth-status-badge');
+  const badge      = document.getElementById('auth-status-badge');
   const countLbl  = document.getElementById('roster-count-lbl');
   const names = Array.from(document.querySelectorAll('#auth-roster-payload-container .roster-name')).map(el => el.value.trim().toLowerCase());
   errorMsg.style.display = successMsg.style.display = 'none';
 
   const match = systemTeams.find(t => {
-    const dMatch = t.name.toLowerCase() === teamDesig || t.id === teamDesig;
-    const tMatch = t.id === token;
+    const dMatch = t.name.toLowerCase() === teamDesig || t.id.toLowerCase() === teamDesig;
+    const tMatch = t.id.toLowerCase() === token;
     const roster = t.members.map(m => m.toLowerCase().trim());
     const mMatch = names.length === t.members.length && names.every(n => n && roster.includes(n));
     return dMatch && tMatch && mMatch;
@@ -1100,7 +999,10 @@ function commitAuthPayloadToGlobalRegistry() {
   const token = document.getElementById('auth-event-token').value.trim();
   const cards = document.querySelectorAll('#auth-roster-payload-container .member-row-card');
   if (!name || token.length !== 5 || isNaN(token)) { alert("Halt: Please supply a proper Team Name and a clear 5-digit numeric code."); return; }
-  if (systemTeams.some(t => t.id === token)) { alert("Conflict: This code has already been taken by another team."); return; }
+  
+  if (systemTeams.some(t => t.id.toLowerCase() === token.toLowerCase() || t.name.toLowerCase() === name.toLowerCase())) { 
+    alert("Conflict: This team name or code has already been taken."); return; 
+  }
 
   let members = [], details = [], valid = true;
   cards.forEach(card => {
@@ -1120,14 +1022,11 @@ function commitAuthPayloadToGlobalRegistry() {
   refreshTeamRegistryViews();
 }
 
-/* ══════════════════════════════════════════
-   ADMIN AUTH
-══════════════════════════════════════════ */
 function attemptAdminAccess() {
   const u = document.getElementById("adminUser").value.trim().toLowerCase();
   const e = document.getElementById("adminEmail").value.trim().toLowerCase();
   const err = document.getElementById("authError");
-  const match = verifiedSystemAdmins.find(a => a.user === u && a.email === e);
+  const match = verifiedSystemAdmins.find(a => a.user.toLowerCase() === u && a.email.toLowerCase() === e);
   if (match) {
     err.style.display = "none"; activeAdminUser = match;
     document.getElementById("admin-banner-title").innerText = `Admin Session: ${match.user.toUpperCase()}`;
@@ -1142,13 +1041,11 @@ function logoutAdmin() {
   refreshTeamRegistryViews(); handleWorkspaceTabRouting('user');
 }
 
-/* ══════════════════════════════════════════
-   CHRONOMETER
-══════════════════════════════════════════ */
 function startGlobalChronometer() {
   if (currentTimerInterval) clearInterval(currentTimerInterval);
   currentTimerInterval = setInterval(() => { if (timeInSeconds > 0) { timeInSeconds--; renderChronometerDisplays(); } }, 1000);
 }
+/* Adjust countdown limits */
 function adjustGlobalTime(m) { timeInSeconds = Math.max(0, timeInSeconds + m * 60); renderChronometerDisplays(); }
 function renderChronometerDisplays() {
   const h = Math.floor(timeInSeconds/3600), m = Math.floor((timeInSeconds%3600)/60), s = timeInSeconds%60;
@@ -1157,16 +1054,15 @@ function renderChronometerDisplays() {
   document.getElementById("workspaceClockDisplay").innerText = f;
 }
 
-/* ══════════════════════════════════════════
-   QUICK TEAM TOOLS
-══════════════════════════════════════════ */
 function triggerAutoTokenGen() { document.getElementById("newEventId").value = Math.floor(10000 + Math.random() * 90000); }
 
 function commitTeamToRegistry() {
   const nameEl = document.getElementById("newTeamName"), idEl = document.getElementById("newEventId");
   const name = nameEl.value.trim(), id = idEl.value.trim();
   if (!name || id.length !== 5 || isNaN(id)) { alert("Error: Valid team name and 5-digit code required."); return; }
-  if (systemTeams.some(t => t.id === id)) { alert("Error: This 5-digit team code is already in use."); return; }
+  if (systemTeams.some(t => t.id.toLowerCase() === id.toLowerCase() || t.name.toLowerCase() === name.toLowerCase())) { 
+    alert("Error: This team name or code is already in use."); return; 
+  }
   systemTeams.push({ id, name, members:[], registration_date: new Date().toISOString().split('T')[0], is_first_login:true, first_login_timestamp:"Awaiting Session...", details:[], maxSize: quickTeamSize });
   nameEl.value = ""; idEl.value = "";
   refreshTeamRegistryViews();
@@ -1189,17 +1085,13 @@ function commitMemberToTeam() {
 function removeTeamNode(i) { systemTeams.splice(i, 1); refreshTeamRegistryViews(); }
 function removeMemberNode(ti, mi) { systemTeams[ti].members.splice(mi,1); if(systemTeams[ti].details) systemTeams[ti].details.splice(mi,1); refreshTeamRegistryViews(); }
 
-/* ══════════════════════════════════════════
-   REFRESH ALL VIEWS
-══════════════════════════════════════════ */
 function refreshTeamRegistryViews() {
   const log   = document.getElementById("registeredTeamsLog");
   const sel   = document.getElementById("targetTeamSelector");
-  const help  = document.getElementById("studentHelpLookupList");
   const tbody = document.getElementById("memberLedgerTableBody");
-  if (!log || !sel || !help || !tbody) return;
+  if (!log || !sel || !tbody) return;
 
-  log.innerHTML = sel.innerHTML = help.innerHTML = tbody.innerHTML = "";
+  log.innerHTML = sel.innerHTML = tbody.innerHTML = "";
   let totalH = 0, ready = 0, pending = 0, firstLogins = 0;
 
   systemTeams.forEach((team, idx) => {
@@ -1208,7 +1100,6 @@ function refreshTeamRegistryViews() {
     if (team.members.length >= max && team.members.length > 0) ready++; else pending++;
     if (team.first_login_timestamp !== "Awaiting Session...") firstLogins++;
 
-    // Team log row
     const row = document.createElement("div"); row.className = "data-item";
     const pills = team.members.map((m,mi) =>
       `<div class="member-pill">${m}<span onclick="removeMemberNode(${idx},${mi})" style="cursor:none;">×</span></div>`
@@ -1230,11 +1121,6 @@ function refreshTeamRegistryViews() {
     opt.value = idx; opt.innerText = `${team.name} (${team.id}) — ${team.members.length}/${max}`;
     sel.appendChild(opt);
 
-    const helpBlock = document.createElement("div");
-    helpBlock.style.cssText = "font-size:12px;border-bottom:1px dashed #1c1c1c;padding-bottom:6px;";
-    helpBlock.innerHTML = `• <strong>${team.name}</strong> [Code: <span style="color:var(--accent);">${team.id}</span>]<br><span style="color:#666;padding-left:10px;font-family:'Space Mono';font-size:11px;">↳ Roster: ${team.members.join(', ')||'No members yet.'}</span>`;
-    help.appendChild(helpBlock);
-
     const memberData = team.details && team.details.length ? team.details : team.members.map((m,i) => ({ name:m, role:ROLES[i%ROLES.length], link:"Internal Record" }));
     memberData.forEach(d => {
       const roleClass = d.role==='Team Lead'?'tag-green':d.role==='Developer'?'tag-blue':'tag-red';
@@ -1251,7 +1137,6 @@ function refreshTeamRegistryViews() {
   document.getElementById("ledger-count-badge").innerText = `${totalH} Total Profiles`;
 
   if (!systemTeams.length) {
-    help.innerText = "No teams created yet. Log into the admin portal to add fresh slots.";
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-muted);font-family:'Space Mono';">The participant directory is completely empty.</td></tr>`;
   }
 
@@ -1259,9 +1144,6 @@ function refreshTeamRegistryViews() {
   detectLoginSize();
 }
 
-/* ══════════════════════════════════════════
-   BROADCAST & SUBMIT
-══════════════════════════════════════════ */
 function toggleProblemRelease() {
   const banner = document.getElementById("hackerProblemBanner");
   const display = document.getElementById("broadcastMessageText");
@@ -1304,9 +1186,6 @@ function renderAdminZipRepository() {
   });
 }
 
-/* ══════════════════════════════════════════
-   INIT
-══════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
   setupNoCopyConstraints();
   renderRosterFields();
