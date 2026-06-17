@@ -646,7 +646,7 @@
 
     <!-- ZIP Vault -->
     <div class="span-full brutalist-card">
-      <div class="card-header-mono">Submitted Solutions Vault (.ZIP Files)</div>
+      <div class="card-header-mono">Submitted Solutions Vault (.ZIP Files) <span style="font-size:9px;color:#444;font-weight:400;margin-left:8px;">● LIVE SYNC</span></div>
       <div class="data-list" id="adminZipRepository">
         <div style="text-align:center;padding:48px;font-family:'Space Mono';font-size:12px;color:var(--text-muted);">Awaiting team design solutions to be uploaded from student work areas...</div>
       </div>
@@ -661,8 +661,10 @@
         </div>
         <span class="figma-count-badge" id="figmaVaultCountBadge">0 Links Submitted</span>
       </div>
-      <div class="figma-status-bar" id="figmaVaultStatus">
+      <div class="figma-status-bar" id="figmaVaultStatus" style="display:flex;align-items:center;gap:10px;">
+        <span style="width:8px;height:8px;background:var(--blue);border-radius:50%;flex-shrink:0;animation:pulse-dot 2s ease-in-out infinite;display:inline-block;"></span>
         Awaiting Figma prototype submissions from participant teams...
+        <span style="margin-left:auto;font-size:10px;color:#333;">AUTO-SYNC: 8s</span>
       </div>
       <div id="figmaVaultList">
         <div style="text-align:center;padding:48px;font-family:'Space Mono';font-size:12px;color:var(--text-muted);" id="figmaVaultEmpty">No Figma links submitted yet. Participants will submit from their workspace.</div>
@@ -855,7 +857,7 @@ let systemTeams = [
     ]
   }
 ];
-let loggedSubmissionsZip = [];
+let loggedSubmissionsZip = []; // legacy — now uses window.storage (shared)
 
 /* ══ EXCEL LOG UTIL ══ */
 function excelLog(msg, type = 'info') {
@@ -1487,34 +1489,86 @@ function setupNoCopyConstraints() {
 
 function triggerPermanentSubmitDialog() { document.getElementById("confirmSubmitDialog").classList.add("active"); }
 function dismissSubmitDialog() { document.getElementById("confirmSubmitDialog").classList.remove("active"); }
-function executeFinalPublishChain() {
+
+/* ══════════════════════════════════════════════
+   SHARED PERSISTENT STORAGE HELPERS
+   All data stored with shared:true so every device sees it
+══════════════════════════════════════════════ */
+const STORAGE_KEY_ZIPS   = 'hackathon-zip-submissions';
+const STORAGE_KEY_FIGMA  = 'hackathon-figma-submissions';
+
+async function storageGet(key) {
+  try {
+    const r = await window.storage.get(key, true);
+    return r ? JSON.parse(r.value) : [];
+  } catch { return []; }
+}
+
+async function storageSet(key, value) {
+  try {
+    await window.storage.set(key, JSON.stringify(value), true);
+  } catch(e) { console.error('Storage write failed:', e); }
+}
+
+/* ══ ZIP / CODE SUBMISSION ══ */
+async function executeFinalPublishChain() {
   dismissSubmitDialog();
   const tName = authenticatedStudentTeam?.name || "Unknown_Team";
   const tId   = authenticatedStudentTeam?.id   || "00000";
-  loggedSubmissionsZip.push({ fileName:`${tName.replace(/\s+/g,'_')}_ID_${tId}_Build.zip`, time:new Date().toLocaleTimeString(), htmlLength:document.getElementById("editorIndex").value.length });
-  renderAdminZipRepository();
+
+  const zips = await storageGet(STORAGE_KEY_ZIPS);
+  // Replace existing entry for this team or push new
+  const idx = zips.findIndex(z => z.teamId === tId);
+  const entry = {
+    teamId: tId,
+    teamName: tName,
+    fileName: `${tName.replace(/\s+/g,'_')}_ID_${tId}_Build.zip`,
+    time: new Date().toLocaleTimeString(),
+    timestamp: new Date().toLocaleString(),
+    htmlLength: document.getElementById("editorIndex").value.length
+  };
+  if (idx >= 0) zips[idx] = entry; else zips.push(entry);
+  await storageSet(STORAGE_KEY_ZIPS, zips);
+
+  await renderAdminZipRepository();
   navigate('thank-you');
 }
-function renderAdminZipRepository() {
+
+async function renderAdminZipRepository() {
   const c = document.getElementById("adminZipRepository"); if (!c) return;
+  const zips = await storageGet(STORAGE_KEY_ZIPS);
   c.innerHTML = "";
-  if (!loggedSubmissionsZip.length) {
+  if (!zips.length) {
     c.innerHTML = `<div style="text-align:center;padding:48px;font-family:'Space Mono';font-size:12px;color:var(--text-muted);">Awaiting team design solutions...</div>`;
     return;
   }
-  loggedSubmissionsZip.forEach(a => {
+  zips.forEach((a, i) => {
     const el = document.createElement("div"); el.className = "zip-item";
-    el.innerHTML = `<div><span style="color:var(--accent);font-weight:700;">📦 ${a.fileName}</span><div style="font-size:11px;color:var(--text-dim);margin-top:2px;font-family:'Space Mono';">Uploaded at ${a.time}</div></div><button class="btn-accent-sm" onclick="alert('Downloading...')">Download ZIP</button>`;
+    el.innerHTML = `
+      <div>
+        <span style="color:var(--accent);font-weight:700;">📦 ${escHtml(a.fileName)}</span>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:2px;font-family:'Space Mono';">
+          ${escHtml(a.teamName)} · Submitted ${escHtml(a.time)}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-accent-sm" onclick="alert('ZIP download requires a server backend.')">⬇ Download ZIP</button>
+        <button class="btn-action" style="font-size:10px;padding:8px 12px;" onclick="removeZipEntry(${i})">✕</button>
+      </div>`;
     c.appendChild(el);
   });
 }
 
-/* ══════════════════════════════════════════════
-   FIGMA LINK VAULT — Participant Submit + Admin View
-══════════════════════════════════════════════ */
-let figmaSubmissions = []; // { teamName, teamId, url, submittedAt }
+async function removeZipEntry(index) {
+  const zips = await storageGet(STORAGE_KEY_ZIPS);
+  zips.splice(index, 1);
+  await storageSet(STORAGE_KEY_ZIPS, zips);
+  await renderAdminZipRepository();
+  showSyncToast('Submission removed.');
+}
 
-function submitFigmaLink() {
+/* ══ FIGMA LINK VAULT ══ */
+async function submitFigmaLink() {
   const input = document.getElementById('figmaLinkInput');
   const errEl = document.getElementById('figmaError');
   const okEl  = document.getElementById('figmaSuccess');
@@ -1535,63 +1589,57 @@ function submitFigmaLink() {
     errEl.style.display = 'block'; return;
   }
 
-  // Check if already submitted by this team — update if so
-  const existing = figmaSubmissions.find(s => s.teamId === authenticatedStudentTeam.id);
-  if (existing) {
-    existing.url = url;
-    existing.submittedAt = new Date().toLocaleTimeString();
-    existing.updatedAt = new Date().toLocaleString();
-  } else {
-    figmaSubmissions.push({
-      teamName: authenticatedStudentTeam.name,
-      teamId:   authenticatedStudentTeam.id,
-      url,
-      submittedAt:  new Date().toLocaleTimeString(),
-      updatedAt:    new Date().toLocaleString()
-    });
-  }
+  const btn = document.querySelector('[onclick="submitFigmaLink()"]');
+  if (btn) btn.disabled = true;
 
-  okEl.textContent = `✓ Figma link submitted successfully for ${authenticatedStudentTeam.name}! Organizers can now access your design.`;
+  const submissions = await storageGet(STORAGE_KEY_FIGMA);
+  const existing = submissions.findIndex(s => s.teamId === authenticatedStudentTeam.id);
+  const entry = {
+    teamName:    authenticatedStudentTeam.name,
+    teamId:      authenticatedStudentTeam.id,
+    url,
+    submittedAt: new Date().toLocaleTimeString(),
+    updatedAt:   new Date().toLocaleString()
+  };
+  if (existing >= 0) submissions[existing] = entry; else submissions.push(entry);
+  await storageSet(STORAGE_KEY_FIGMA, submissions);
+
+  okEl.textContent = `✓ Figma link submitted for ${authenticatedStudentTeam.name}! Organizers can now access your design.`;
   okEl.style.display = 'block';
   input.value = '';
+  if (btn) setTimeout(() => { btn.disabled = false; }, 3000);
 
-  // Disable input briefly to prevent double-submit
-  const btn = document.querySelector('[onclick="submitFigmaLink()"]');
-  if (btn) { btn.disabled = true; setTimeout(() => { btn.disabled = false; }, 3000); }
-
-  renderAdminFigmaVault();
+  await renderAdminFigmaVault();
   showSyncToast(`🎨 Figma link received from ${authenticatedStudentTeam.name}`);
 }
 
-function renderAdminFigmaVault() {
-  const list    = document.getElementById('figmaVaultList');
-  const empty   = document.getElementById('figmaVaultEmpty');
-  const badge   = document.getElementById('figmaVaultCountBadge');
-  const statusEl= document.getElementById('figmaVaultStatus');
+async function renderAdminFigmaVault() {
+  const list     = document.getElementById('figmaVaultList');
+  const badge    = document.getElementById('figmaVaultCountBadge');
+  const statusEl = document.getElementById('figmaVaultStatus');
   if (!list) return;
 
-  badge && (badge.textContent = `${figmaSubmissions.length} Link${figmaSubmissions.length !== 1 ? 's' : ''} Submitted`);
+  const submissions = await storageGet(STORAGE_KEY_FIGMA);
+  badge && (badge.textContent = `${submissions.length} Link${submissions.length !== 1 ? 's' : ''} Submitted`);
   const statFig = document.getElementById('statFigmaLinks');
-  if (statFig) statFig.textContent = figmaSubmissions.length;
+  if (statFig) statFig.textContent = submissions.length;
 
-  if (!figmaSubmissions.length) {
+  if (!submissions.length) {
     statusEl && (statusEl.textContent = 'Awaiting Figma prototype submissions from participant teams...');
-    list.innerHTML = `<div style="text-align:center;padding:48px;font-family:'Space Mono';font-size:12px;color:var(--text-muted);" id="figmaVaultEmpty">No Figma links submitted yet. Participants will submit from their workspace.</div>`;
+    list.innerHTML = `<div style="text-align:center;padding:48px;font-family:'Space Mono';font-size:12px;color:var(--text-muted);">No Figma links submitted yet. Participants will submit from their workspace.</div>`;
     return;
   }
 
-  statusEl && (statusEl.textContent = `${figmaSubmissions.length} design link(s) received — last updated ${new Date().toLocaleTimeString()}`);
+  statusEl && (statusEl.textContent = `${submissions.length} design link(s) received — last synced ${new Date().toLocaleTimeString()}`);
 
-  list.innerHTML = figmaSubmissions.map((s, i) => `
+  list.innerHTML = submissions.map((s, i) => `
     <div class="figma-card">
-      <div>
-        <div class="figma-team-badge">${s.teamName} — ID: ${s.teamId}</div>
-      </div>
+      <div><div class="figma-team-badge">${escHtml(s.teamName)} — ID: ${escHtml(s.teamId)}</div></div>
       <div style="flex:1;">
         <div class="figma-link-text">
           <a href="${escHtml(s.url)}" target="_blank" rel="noopener">${escHtml(s.url)}</a>
         </div>
-        <div class="figma-meta">Submitted at ${s.submittedAt} &nbsp;·&nbsp; Last updated: ${s.updatedAt}</div>
+        <div class="figma-meta">Submitted ${escHtml(s.submittedAt)} &nbsp;·&nbsp; Updated: ${escHtml(s.updatedAt)}</div>
       </div>
       <div style="display:flex;gap:8px;flex-shrink:0;">
         <a href="${escHtml(s.url)}" target="_blank" rel="noopener"
@@ -1604,25 +1652,43 @@ function renderAdminFigmaVault() {
   `).join('');
 }
 
-function removeFigmaEntry(index) {
-  figmaSubmissions.splice(index, 1);
-  renderAdminFigmaVault();
+async function removeFigmaEntry(index) {
+  const submissions = await storageGet(STORAGE_KEY_FIGMA);
+  submissions.splice(index, 1);
+  await storageSet(STORAGE_KEY_FIGMA, submissions);
+  await renderAdminFigmaVault();
   showSyncToast('Figma entry removed.');
 }
 
 function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+/* ══ LIVE POLLING — refresh admin vault every 8 seconds ══ */
+let _adminPollInterval = null;
+function startAdminLiveSync() {
+  if (_adminPollInterval) return;
+  _adminPollInterval = setInterval(async () => {
+    const adminPage = document.getElementById('page-admin-dashboard');
+    if (adminPage && adminPage.classList.contains('active')) {
+      await renderAdminZipRepository();
+      await renderAdminFigmaVault();
+    }
+  }, 8000);
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
   setupNoCopyConstraints();
   renderRosterFields();
   buildLoginFields(3);
   refreshTeamRegistryViews();
   startGlobalChronometer();
-  renderAdminFigmaVault();
+  startAdminLiveSync();
+  await renderAdminZipRepository();
+  await renderAdminFigmaVault();
   excelLog('Admin dashboard ready. Use Export to download data or Import to sync from Excel.', 'ok');
 });
 </script>
 </body>
-</html> 
+</html>
