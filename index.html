@@ -74,8 +74,8 @@
   }
 
   /* ═══════════════════════════════
-     CURTAIN SYSTEM
-  ═══════════════════════════════ */
+      CURTAIN SYSTEM
+   ═══════════════════════════════ */
   #curtain-overlay {
     position: fixed; inset: 0; z-index: 50000;
     pointer-events: all; overflow: hidden;
@@ -289,8 +289,8 @@
   select.input-field { cursor: none; }
 
   /* ═══════════════════════════════
-     ANIMATED BUTTONS
-  ═══════════════════════════════ */
+      ANIMATED BUTTONS
+   ═══════════════════════════════ */
   .form-submit {
     width: 100%; padding: 16px; background: var(--accent); color: #000;
     border: 2px solid var(--border-dark); font-family: 'Space Mono', monospace;
@@ -300,7 +300,6 @@
                 box-shadow 0.15s ease, background 0.15s ease, letter-spacing 0.15s ease;
     position: relative; overflow: hidden; margin-top: 12px;
   }
-  /* Inverse colour sweep on hover */
   .form-submit::before {
     content: attr(data-hover);
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -421,13 +420,9 @@
 </head>
 <body>
 
-<!-- ══ CURSOR ══ -->
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
 
-<!-- ══════════════════════════════════
-     CURTAIN INTRO
-══════════════════════════════════ -->
 <div id="curtain-overlay">
   <div class="curtain-rod">
     <div class="hook" style="left:8%"></div>  <div class="hook" style="left:18%"></div>
@@ -446,7 +441,6 @@
   <div id="tap-prompt"></div>
 </div>
 
-<!-- ══ NAV ══ -->
 <nav class="nav">
   <div class="nav-logo">REAL IDEAS // REAL IMPACT // <span>DESIGNVERSE</span></div>
   <div class="nav-spacer"></div>
@@ -457,9 +451,6 @@
   <div class="nav-avatar" id="current-user-avatar">👤 GUEST</div>
 </nav>
 
-<!-- ══════════════════════════════════
-     PAGE: LANDING
-══════════════════════════════════ -->
 <div id="page-landing" class="page active">
   <div class="poster-canvas">
 
@@ -484,7 +475,6 @@
       </div>
     </div>
 
-    <!-- Login card -->
     <div style="height:100%;overflow-y:auto;padding-right:4px;" class="inner-scroll-card">
       <div class="brutalist-card" style="background:#111111;border-width:2px;margin-bottom:0;">
         <div class="tape-strip tape-tl"></div>
@@ -515,9 +505,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     PAGE: ADMIN AUTH
-══════════════════════════════════ -->
 <div id="page-admin-auth" class="page">
   <div style="display:flex;justify-content:center;align-items:center;min-height:calc(100vh - var(--nav-h) - 120px);padding:24px;">
     <div class="brutalist-card" style="width:100%;max-width:440px;background:#111111;">
@@ -531,9 +518,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     PAGE: ADMIN DASHBOARD
-══════════════════════════════════ -->
 <div id="page-admin-dashboard" class="page">
   <div class="admin-dashboard-grid">
 
@@ -545,18 +529,16 @@
       <button class="btn-action" style="color:var(--red);border-color:var(--red);" onclick="logoutAdmin()">Log Out</button>
     </div>
 
-    <!-- Metrics -->
     <div class="span-full brutalist-card">
       <div class="card-header-mono">Event Attendance &amp; Team Trackers</div>
       <div class="grid-metrics">
-        <div class="metric-block"><label class="control-label">Registered Teams</label><div class="metric-value" id="statTotalTeams">2</div></div>
-        <div class="metric-block"><label class="control-label">Total Participants</label><div class="metric-value" id="statTotalHackers">6</div></div>
-        <div class="metric-block"><label class="control-label" style="color:var(--accent);">Complete Teams (3 Members)</label><div class="metric-value" style="color:var(--accent);" id="statReadyTeams">2</div></div>
-        <div class="metric-block"><label class="control-label" style="color:var(--yellow);">First-Time Logins Active</label><div class="metric-value" style="color:var(--yellow);" id="statFirstLogins">0</div></div>
+        <div class="metric-block"><label class="control-label">Registered Teams</label><div class="metric-value" id="statTotalTeams">0</div></div>
+        <div class="metric-block"><label class="control-label">Total Participants</label><div class="metric-value" id="statTotalHackers">0</div></div>
+        <div class="metric-block"><label class="control-label" style="color:var(--accent);">Complete Teams</label><div class="metric-value" style="color:var(--accent);" id="statReadyTeams">0</div></div>
+        <div class="metric-block"><label class="control-label" style="color:var(--yellow);">Active Logins</label><div class="metric-value" style="color:var(--yellow);" id="statFirstLogins">0</div></div>
       </div>
     </div>
 
-    <!-- First-Time Access Monitor -->
     <div class="span-full brutalist-card" id="admin-first-time-tracking-section">
       <div class="card-header-mono">
         <span>🆕 New Users / First-Time Access Monitoring</span>
@@ -587,7 +569,6 @@
       </div>
     </div>
 
-    <!-- Team Registration Builder with SIZE SELECTOR -->
     <div class="brutalist-card" id="admin-team-auth-section">
       <div class="crosshair-decor" style="top:14px;left:14px;"></div>
       <div class="card-header-mono">
@@ -626,11 +607,10 @@
       </form>
     </div>
 
-    <!-- Attendee Directory -->
     <div class="brutalist-card" id="member-ledger-section">
       <div class="card-header-mono">
         <span>📋 Master Attendee Directory</span>
-        <span class="tag tag-green" id="ledger-count-badge">6 Registered Attendees</span>
+        <span class="tag tag-green" id="ledger-count-badge">0 Registered Attendees</span>
       </div>
       <div class="ledger-scroll-wrapper">
         <table class="matrix-table">
@@ -640,7 +620,6 @@
       </div>
     </div>
 
-    <!-- Countdown Control -->
     <div class="brutalist-card">
       <div class="card-header-mono">Main Event Countdown Clock Control</div>
       <div style="display:flex;align-items:center;gap:16px;margin-top:12px;background:#000;padding:20px;border:2px solid var(--border-dark);">
@@ -652,7 +631,6 @@
       </div>
     </div>
 
-    <!-- Broadcast -->
     <div class="brutalist-card">
       <div class="card-header-mono">Broadcast Problem Statement to All Teams</div>
       <div class="control-group">
@@ -661,7 +639,6 @@
       <button class="form-submit" data-hover="SEND PROBLEM STATEMENT" id="broadcastBtn" style="margin:0;" onclick="toggleProblemRelease()">Send Problem Statement to Workspace</button>
     </div>
 
-    <!-- Quick Team Creator with SIZE SELECTOR -->
     <div class="span-full brutalist-card">
       <div class="card-header-mono">
         <span>Quick Team Creator Tool</span>
@@ -697,7 +674,6 @@
       </div>
     </div>
 
-    <!-- Submissions Vault -->
     <div class="span-full brutalist-card">
       <div class="card-header-mono">Submitted Solutions Vault (.ZIP Files)</div>
       <div class="data-list" id="adminZipRepository">
@@ -708,9 +684,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     PAGE: WORKSPACE
-══════════════════════════════════ -->
 <div id="page-workspace-view" class="page">
   <div class="workspace-layout-container">
     <div class="countdown-banner">
@@ -768,7 +741,6 @@
   </div>
 </div>
 
-<!-- ══ THANK YOU ══ -->
 <div id="page-thank-you" class="page">
   <div class="thanks-layout">
     <div style="font-size:72px;color:var(--accent);margin-bottom:20px;font-weight:700;line-height:1;">✓</div>
@@ -778,7 +750,6 @@
   </div>
 </div>
 
-<!-- ══ SUBMIT DIALOG ══ -->
 <div class="dialog-overlay" id="confirmSubmitDialog">
   <div class="dialog-box">
     <div style="color:var(--yellow);font-size:18px;font-weight:700;">⚠️ Confirm Permanent Solution Submission?</div>
@@ -790,8 +761,28 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
 <script>
+/* ══════════════════════════════════════════
+   FIREBASE CONTEXT INITIALIZATION
+══════════════════════════════════════════ */
+// NOTE: Replace these values with your actual web configuration settings from the Firebase Console project.
+const firebaseConfig = {
+  apiKey: "AIzaSyC_j2wnlO-ZJP4ovbxTQXer-jVvJormUC4",
+  authDomain: "designverse-ad253.firebaseapp.com",
+  projectId: "designverse-ad253",
+  storageBucket: "designverse-ad253.firebasestorage.app",
+  messagingSenderId: "493485421412",
+  appId: "1:493485421412:web:63a4bca852cbd2defa4071",
+  measurementId: "G-J08JNPXZVW"
+};
+
+// Initialize Firebase Instance
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 /* ══════════════════════════════════════════
    CURSOR + TRAIL
 ══════════════════════════════════════════ */
@@ -857,7 +848,6 @@ curtainEl.addEventListener('touchstart', openCurtain, { passive: true });
    APP STATE
 ══════════════════════════════════════════ */
 let timeInSeconds = 71 * 3600 + 57 * 60 + 39;
-let currentTimerInterval = null;
 let activeAdminUser = null;
 let authenticatedStudentTeam = null;
 let isProblemRevealed = false;
@@ -865,35 +855,67 @@ let currentTeamSize = 3;
 let quickTeamSize = 3;
 
 const ROLES = ['Team Lead', 'Developer', 'Designer', 'Researcher', 'Strategist'];
-
 const verifiedSystemAdmins = [
   { user: 'naman', email: 'naman@gmail.com' },
   { user: 'palak', email: 'palak@gmail.com' }
 ];
 
-let systemTeams = [
-  {
-    id: "11111", name: "Team 1", members: ["Aman","Rohan","Sonal"],
-    registration_date: "2026-06-11", is_first_login: true,
-    first_login_timestamp: "Awaiting Session...",
-    details: [
-      { name:"Aman",  role:"Team Lead",  link:"internal://node-aman" },
-      { name:"Rohan", role:"Developer",  link:"internal://node-rohan" },
-      { name:"Sonal", role:"Designer",   link:"internal://node-sonal" }
-    ]
-  },
-  {
-    id: "22222", name: "Team 2", members: ["Karan","Priya","Amit"],
-    registration_date: "2026-06-12", is_first_login: true,
-    first_login_timestamp: "Awaiting Session...",
-    details: [
-      { name:"Karan", role:"Developer",  link:"internal://node-karan" },
-      { name:"Priya", role:"Team Lead",  link:"internal://node-priya" },
-      { name:"Amit",  role:"Designer",   link:"internal://node-amit" }
-    ]
-  }
-];
+let systemTeams = [];
 let loggedSubmissionsZip = [];
+
+/* ══════════════════════════════════════════
+   REAL-TIME SUBSCRIPTIONS (FIREBASE HOOKS)
+══════════════════════════════════════════ */
+// Synchronize Teams Data Model
+database.ref('systemTeams').on('value', snapshot => {
+  const data = snapshot.val();
+  systemTeams = data ? Object.values(data) : [];
+  refreshTeamRegistryViews();
+});
+
+// Synchronize Submission Repository Engine
+database.ref('loggedSubmissionsZip').on('value', snapshot => {
+  const data = snapshot.val();
+  loggedSubmissionsZip = data ? Object.values(data) : [];
+  renderAdminZipRepository();
+});
+
+// Synchronize Problem Statement Broadcast Stream
+database.ref('broadcastState').on('value', snapshot => {
+  const data = snapshot.val();
+  if (data) {
+    isProblemRevealed = data.active;
+    const banner = document.getElementById("hackerProblemBanner");
+    const display = document.getElementById("broadcastMessageText");
+    const btn = document.getElementById("broadcastBtn");
+    
+    if (isProblemRevealed) {
+      display.innerText = data.text;
+      banner.classList.add("active");
+      if(btn) { btn.innerText = "Hide Broadcasted Statement"; btn.style.background = "var(--red)"; btn.style.color = "#fff"; }
+    } else {
+      banner.classList.remove("active");
+      if(btn) { btn.innerText = "Send Problem Statement to Workspace"; btn.style.background = "var(--accent)"; btn.style.color = "#000"; }
+    }
+  }
+});
+
+// Synchronize Chronometer Timing Framework
+database.ref('timeInSeconds').on('value', snapshot => {
+  const data = snapshot.val();
+  if (data !== null) {
+    timeInSeconds = data;
+    renderChronometerDisplays();
+  }
+});
+
+/* Master clock processing pipeline loop */
+setInterval(() => {
+  if (activeAdminUser && timeInSeconds > 0) {
+    timeInSeconds--;
+    database.ref('timeInSeconds').set(timeInSeconds);
+  }
+}, 1000);
 
 /* ══════════════════════════════════════════
    TEAM SIZE CONTROLS
@@ -910,6 +932,7 @@ function setQuickSize(n) {
 
 function renderRosterFields() {
   const c = document.getElementById('auth-roster-payload-container');
+  if(!c) return;
   c.innerHTML = '';
   for (let i = 0; i < currentTeamSize; i++) {
     const defaultRole = ROLES[i % ROLES.length];
@@ -929,18 +952,17 @@ function renderRosterFields() {
   document.getElementById('roster-count-lbl').textContent = `0 / ${currentTeamSize} Added`;
 }
 
-/* Auto-detect login field count from team identifier */
 function detectLoginSize() {
   const val  = document.getElementById('studTeamNo').value.trim().toLowerCase();
   const code = document.getElementById('studEventId').value.trim();
   const match = systemTeams.find(t => t.name.toLowerCase() === val || t.id === val || t.id === code);
-  buildLoginFields(match ? match.members.length : 3);
+  buildLoginFields(match ? (match.members ? match.members.length : 3) : 3);
 }
 
 function buildLoginFields(count) {
   const c = document.getElementById('loginMemberFields');
   const lbl = document.getElementById('loginMemberLabel');
-  if (c.querySelectorAll('input').length === count) return; // no rebuild needed
+  if (!c || c.querySelectorAll('input').length === count) return;
   c.innerHTML = '';
   lbl.textContent = `Verify Your Team Members (Enter All ${count} Names)`;
   for (let i = 0; i < count; i++) {
@@ -972,7 +994,7 @@ function handleWorkspaceTabRouting(portalKey) {
 }
 
 /* ══════════════════════════════════════════
-   STUDENT LOGIN — supports any team size
+   STUDENT ACCESS SUB-ROUTINES
 ══════════════════════════════════════════ */
 function attemptStudentLogin() {
   const teamNoVal  = document.getElementById("studTeamNo").value.trim().toLowerCase();
@@ -989,6 +1011,7 @@ function attemptStudentLogin() {
   const match = systemTeams.find(t => {
     const idMatch = t.name.toLowerCase() === teamNoVal || t.id === teamNoVal;
     const tokenMatch = t.id === eventIdVal;
+    if(!t.members) return false;
     const roster = t.members.map(m => m.toLowerCase().trim());
     const membersMatch = memberVals.length === t.members.length && memberVals.every(v => roster.includes(v));
     return idMatch && tokenMatch && membersMatch;
@@ -999,7 +1022,7 @@ function attemptStudentLogin() {
     if (match.is_first_login) {
       match.is_first_login = false;
       match.first_login_timestamp = new Date().toLocaleString();
-      refreshTeamRegistryViews();
+      database.ref('systemTeams/' + match.id).set(match);
     }
     authenticatedStudentTeam = match;
     document.getElementById("activeWorkspaceTeamTag").innerText  = `ACTIVE WORKSPACE: ${match.name.toUpperCase()} (#${match.id})`;
@@ -1017,7 +1040,6 @@ function attemptStudentLogin() {
 function logoutStudent() {
   authenticatedStudentTeam = null;
   document.getElementById("current-user-avatar").innerText = "👤 GUEST";
-  refreshTeamRegistryViews();
   handleWorkspaceTabRouting('user');
 }
 
@@ -1078,6 +1100,7 @@ function handleRegionalTeamAuthentication(event) {
   const match = systemTeams.find(t => {
     const dMatch = t.name.toLowerCase() === teamDesig || t.id === teamDesig;
     const tMatch = t.id === token;
+    if(!t.members) return false;
     const roster = t.members.map(m => m.toLowerCase().trim());
     const mMatch = names.length === t.members.length && names.every(n => n && roster.includes(n));
     return dMatch && tMatch && mMatch;
@@ -1112,12 +1135,14 @@ function commitAuthPayloadToGlobalRegistry() {
   });
   if (!valid || members.length !== currentTeamSize) { alert(`Halt: Fill all ${currentTeamSize} member name boxes.`); return; }
 
-  systemTeams.push({ id:token, name, members, registration_date: new Date().toISOString().split('T')[0], is_first_login:true, first_login_timestamp:"Awaiting Session...", details });
-  alert(`Successfully created "${name}" with ${currentTeamSize} members and saved to your directory.`);
-  document.getElementById('auth-team-designation').value = "";
-  document.getElementById('auth-event-token').value = "";
-  renderRosterFields();
-  refreshTeamRegistryViews();
+  const newTeam = { id:token, name, members, registration_date: new Date().toISOString().split('T')[0], is_first_login:true, first_login_timestamp:"Awaiting Session...", details };
+  
+  database.ref('systemTeams/' + token).set(newTeam).then(() => {
+    alert(`Successfully created "${name}" with ${currentTeamSize} members and saved to database.`);
+    document.getElementById('auth-team-designation').value = "";
+    document.getElementById('auth-event-token').value = "";
+    renderRosterFields();
+  });
 }
 
 /* ══════════════════════════════════════════
@@ -1139,17 +1164,16 @@ function attemptAdminAccess() {
 function logoutAdmin() {
   activeAdminUser = null;
   document.getElementById("current-user-avatar").innerText = "👤 GUEST";
-  refreshTeamRegistryViews(); handleWorkspaceTabRouting('user');
+  handleWorkspaceTabRouting('user');
 }
 
 /* ══════════════════════════════════════════
-   CHRONOMETER
+   CHRONOMETER DISPLAY LOGIC
 ══════════════════════════════════════════ */
-function startGlobalChronometer() {
-  if (currentTimerInterval) clearInterval(currentTimerInterval);
-  currentTimerInterval = setInterval(() => { if (timeInSeconds > 0) { timeInSeconds--; renderChronometerDisplays(); } }, 1000);
+function adjustGlobalTime(m) { 
+  timeInSeconds = Math.max(0, timeInSeconds + m * 60); 
+  database.ref('timeInSeconds').set(timeInSeconds);
 }
-function adjustGlobalTime(m) { timeInSeconds = Math.max(0, timeInSeconds + m * 60); renderChronometerDisplays(); }
 function renderChronometerDisplays() {
   const h = Math.floor(timeInSeconds/3600), m = Math.floor((timeInSeconds%3600)/60), s = timeInSeconds%60;
   const f = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
@@ -1167,75 +1191,98 @@ function commitTeamToRegistry() {
   const name = nameEl.value.trim(), id = idEl.value.trim();
   if (!name || id.length !== 5 || isNaN(id)) { alert("Error: Valid team name and 5-digit code required."); return; }
   if (systemTeams.some(t => t.id === id)) { alert("Error: This 5-digit team code is already in use."); return; }
-  systemTeams.push({ id, name, members:[], registration_date: new Date().toISOString().split('T')[0], is_first_login:true, first_login_timestamp:"Awaiting Session...", details:[], maxSize: quickTeamSize });
-  nameEl.value = ""; idEl.value = "";
-  refreshTeamRegistryViews();
+  
+  const newTeam = { id, name, members:[], registration_date: new Date().toISOString().split('T')[0], is_first_login:true, first_login_timestamp:"Awaiting Session...", details:[], maxSize: quickTeamSize };
+  
+  database.ref('systemTeams/' + id).set(newTeam).then(() => {
+    nameEl.value = ""; idEl.value = "";
+  });
 }
 
 function commitMemberToTeam() {
   const sel = document.getElementById("targetTeamSelector"), inp = document.getElementById("newMemberName");
   const name = inp.value.trim();
   if (!sel.options.length || !name) return;
-  const team = systemTeams[parseInt(sel.value)];
+  
+  const teamId = sel.value;
+  const team = systemTeams.find(t => t.id === teamId);
+  if(!team) return;
+  
   const max = team.maxSize || 3;
-  if (team.members.length >= max) { alert(`Error: This team is full (max ${max} members).`); return; }
+  if (team.members && team.members.length >= max) { alert(`Error: This team is full (max ${max} members).`); return; }
+  
+  if(!team.members) team.members = [];
+  if(!team.details) team.details = [];
+  
   const role = ROLES[team.members.length % ROLES.length];
   team.members.push(name);
-  if (!team.details) team.details = [];
   team.details.push({ name, role, link:"Added via Admin Panel" });
-  inp.value = ""; refreshTeamRegistryViews();
+  
+  database.ref('systemTeams/' + teamId).set(team).then(() => {
+    inp.value = "";
+  });
 }
 
-function removeTeamNode(i) { systemTeams.splice(i, 1); refreshTeamRegistryViews(); }
-function removeMemberNode(ti, mi) { systemTeams[ti].members.splice(mi,1); if(systemTeams[ti].details) systemTeams[ti].details.splice(mi,1); refreshTeamRegistryViews(); }
+function removeTeamNode(id) { 
+  database.ref('systemTeams/' + id).remove(); 
+}
+
+function removeMemberNode(teamId, mi) { 
+  const team = systemTeams.find(t => t.id === teamId);
+  if(!team) return;
+  team.members.splice(mi,1); 
+  if(team.details) team.details.splice(mi,1); 
+  database.ref('systemTeams/' + teamId).set(team);
+}
 
 /* ══════════════════════════════════════════
-   REFRESH ALL VIEWS
+   UI ENGINE REFRESH CALLS
 ══════════════════════════════════════════ */
 function refreshTeamRegistryViews() {
-  const log   = document.getElementById("registeredTeamsLog");
-  const sel   = document.getElementById("targetTeamSelector");
-  const help  = document.getElementById("studentHelpLookupList");
-  const tbody = document.getElementById("memberLedgerTableBody");
+  const log    = document.getElementById("registeredTeamsLog");
+  const sel    = document.getElementById("targetTeamSelector");
+  const help   = document.getElementById("studentHelpLookupList");
+  const tbody  = document.getElementById("memberLedgerTableBody");
   if (!log || !sel || !help || !tbody) return;
 
   log.innerHTML = sel.innerHTML = help.innerHTML = tbody.innerHTML = "";
   let totalH = 0, ready = 0, pending = 0, firstLogins = 0;
 
-  systemTeams.forEach((team, idx) => {
-    const max = team.maxSize || team.members.length || 3;
-    totalH += team.members.length;
-    if (team.members.length >= max && team.members.length > 0) ready++; else pending++;
+  systemTeams.forEach((team) => {
+    const max = team.maxSize || (team.members ? team.members.length : 3) || 3;
+    const mLen = team.members ? team.members.length : 0;
+    totalH += mLen;
+    if (mLen >= max && mLen > 0) ready++; else pending++;
     if (team.first_login_timestamp !== "Awaiting Session...") firstLogins++;
 
     // Team log row
     const row = document.createElement("div"); row.className = "data-item";
-    const pills = team.members.map((m,mi) =>
-      `<div class="member-pill">${m}<span onclick="removeMemberNode(${idx},${mi})" style="cursor:none;">×</span></div>`
-    ).join('');
-    const isFull = team.members.length >= max && team.members.length > 0;
+    const pills = team.members ? team.members.map((m,mi) =>
+      `<div class="member-pill">${m}<span onclick="removeMemberNode('${team.id}',${mi})" style="cursor:none;">×</span></div>`
+    ).join('') : '';
+    const isFull = mLen >= max && mLen > 0;
     row.innerHTML = `
       <div style="flex:1;">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <strong style="color:#fff;font-size:14px;font-family:'Space Grotesk';font-weight:700;">${team.name}</strong>
           <span style="font-family:'Space Mono';font-size:11px;color:var(--accent);background:#000;padding:2px 8px;border:1px solid #222;">Code: ${team.id}</span>
-          <span style="font-size:11px;font-family:'Space Mono';color:${isFull?'var(--accent)':'var(--yellow)'};">[${team.members.length}/${max} ${isFull?'FULL':'SLOTS OPEN'}]</span>
+          <span style="font-size:11px;font-family:'Space Mono';color:${isFull?'var(--accent)':'var(--yellow)'};">[${mLen}/${max} ${isFull?'FULL':'SLOTS OPEN'}]</span>
         </div>
         <div class="member-pills">${pills || '<span style="font-size:11px;font-family:\'Space Mono\';color:#444;">No participants added yet.</span>'}</div>
       </div>
-      <button style="color:var(--red);border:none;background:none;font-weight:700;font-family:'Space Mono';font-size:11px;text-transform:uppercase;cursor:none;" onclick="removeTeamNode(${idx})">Delete</button>`;
+      <button style="color:var(--red);border:none;background:none;font-weight:700;font-family:'Space Mono';font-size:11px;text-transform:uppercase;cursor:none;" onclick="removeTeamNode('${team.id}')">Delete</button>`;
     log.appendChild(row);
 
     const opt = document.createElement("option");
-    opt.value = idx; opt.innerText = `${team.name} (${team.id}) — ${team.members.length}/${max}`;
+    opt.value = team.id; opt.innerText = `${team.name} (${team.id}) — ${mLen}/${max}`;
     sel.appendChild(opt);
 
     const helpBlock = document.createElement("div");
     helpBlock.style.cssText = "font-size:12px;border-bottom:1px dashed #1c1c1c;padding-bottom:6px;";
-    helpBlock.innerHTML = `• <strong>${team.name}</strong> [Code: <span style="color:var(--accent);">${team.id}</span>]<br><span style="color:#666;padding-left:10px;font-family:'Space Mono';font-size:11px;">↳ Roster: ${team.members.join(', ')||'No members yet.'}</span>`;
+    helpBlock.innerHTML = `• <strong>${team.name}</strong> [Code: <span style="color:var(--accent);">${team.id}</span>]<br><span style="color:#666;padding-left:10px;font-family:'Space Mono';font-size:11px;">↳ Roster: ${(team.members ? team.members.join(', ') : '') || 'No members yet.'}</span>`;
     help.appendChild(helpBlock);
 
-    const memberData = team.details && team.details.length ? team.details : team.members.map((m,i) => ({ name:m, role:ROLES[i%ROLES.length], link:"Internal Record" }));
+    const memberData = team.details && team.details.length ? team.details : (team.members ? team.members.map((m,i) => ({ name:m, role:ROLES[i%ROLES.length], link:"Internal Record" })) : []);
     memberData.forEach(d => {
       const roleClass = d.role==='Team Lead'?'tag-green':d.role==='Developer'?'tag-blue':'tag-red';
       const tr = document.createElement("tr");
@@ -1263,18 +1310,12 @@ function refreshTeamRegistryViews() {
    BROADCAST & SUBMIT
 ══════════════════════════════════════════ */
 function toggleProblemRelease() {
-  const banner = document.getElementById("hackerProblemBanner");
-  const display = document.getElementById("broadcastMessageText");
-  const btn = document.getElementById("broadcastBtn");
   isProblemRevealed = !isProblemRevealed;
-  if (isProblemRevealed) {
-    display.innerText = document.getElementById("challengeInput").value.trim();
-    banner.classList.add("active");
-    btn.innerText = "Hide Broadcasted Statement"; btn.style.background = "var(--red)"; btn.style.color = "#fff";
-  } else {
-    banner.classList.remove("active");
-    btn.innerText = "Send Problem Statement to Workspace"; btn.style.background = "var(--accent)"; btn.style.color = "#000";
-  }
+  const txt = document.getElementById("challengeInput").value.trim();
+  database.ref('broadcastState').set({
+    active: isProblemRevealed,
+    text: txt
+  });
 }
 
 function setupNoCopyConstraints() {
@@ -1286,13 +1327,24 @@ function setupNoCopyConstraints() {
 
 function triggerPermanentSubmitDialog() { document.getElementById("confirmSubmitDialog").classList.add("active"); }
 function dismissSubmitDialog() { document.getElementById("confirmSubmitDialog").classList.remove("active"); }
+
 function executeFinalPublishChain() {
   dismissSubmitDialog();
   const tName = authenticatedStudentTeam?.name || "Unknown_Team";
   const tId   = authenticatedStudentTeam?.id   || "00000";
-  loggedSubmissionsZip.push({ fileName:`${tName.replace(/\s+/g,'_')}_ID_${tId}_Build.zip`, time:new Date().toLocaleTimeString(), htmlLength:document.getElementById("editorIndex").value.length });
-  renderAdminZipRepository(); navigate('thank-you');
+  const submissionKey = database.ref('loggedSubmissionsZip').push().key;
+  
+  const newSubmission = {
+    fileName: `${tName.replace(/\s+/g,'_')}_ID_${tId}_Build.zip`,
+    time: new Date().toLocaleTimeString(),
+    htmlLength: document.getElementById("editorIndex").value.length
+  };
+  
+  database.ref('loggedSubmissionsZip/' + submissionKey).set(newSubmission).then(() => {
+    navigate('thank-you');
+  });
 }
+
 function renderAdminZipRepository() {
   const c = document.getElementById("adminZipRepository"); if (!c) return;
   c.innerHTML = "";
@@ -1305,14 +1357,12 @@ function renderAdminZipRepository() {
 }
 
 /* ══════════════════════════════════════════
-   INIT
+   BOOT ENGINE
 ══════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
   setupNoCopyConstraints();
   renderRosterFields();
   buildLoginFields(3);
-  refreshTeamRegistryViews();
-  startGlobalChronometer();
 });
 </script>
 </body>
