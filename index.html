@@ -718,6 +718,7 @@
       <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;font-family:'Space Mono';">Select team size, then fill in member details to add to the directory.</p>
       <label class="control-label">Select Team Size</label>
       <div class="team-size-row" id="teamSizeBtns">
+        <button class="size-btn" onclick="setTeamSize(1)">1 Member</button>
         <button class="size-btn" onclick="setTeamSize(2)">2 Members</button>
         <button class="size-btn active" onclick="setTeamSize(3)">3 Members</button>
         <button class="size-btn" onclick="setTeamSize(4)">4 Members</button>
@@ -754,6 +755,44 @@
           <thead><tr><th>Full Name</th><th>Assigned Event Role</th><th>Assigned Team</th><th>Team Code</th><th>Profile Links</th></tr></thead>
           <tbody id="memberLedgerTableBody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <div class="span-full brutalist-card" id="admin-team-directory-section">
+      <div class="card-header-mono">
+        <span>👥 Team Directory</span>
+        <span class="tag tag-blue" id="team-dir-count-badge">0 Teams</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:20px;font-family:'Space Mono';">All registered teams grouped by size — showing team name and member roster.</p>
+
+      <!-- 3-Member Teams -->
+      <div id="dir-section-trio" style="margin-bottom:28px;">
+        <div style="font-family:'Space Mono';font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);border-bottom:2px dashed #222;padding-bottom:8px;margin-bottom:16px;">
+          ◈ 3-Member Teams <span id="dir-trio-count" style="color:var(--text-dim);font-weight:400;">(0)</span>
+        </div>
+        <div id="dir-trio-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+          <div style="font-family:'Space Mono';font-size:11px;color:var(--text-muted);padding:16px;border:1px dashed #1a1a1a;">No 3-member teams yet.</div>
+        </div>
+      </div>
+
+      <!-- 2-Member Teams -->
+      <div id="dir-section-duo" style="margin-bottom:28px;">
+        <div style="font-family:'Space Mono';font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);border-bottom:2px dashed #222;padding-bottom:8px;margin-bottom:16px;">
+          ◈ 2-Member Teams <span id="dir-duo-count" style="color:var(--text-dim);font-weight:400;">(0)</span>
+        </div>
+        <div id="dir-duo-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+          <div style="font-family:'Space Mono';font-size:11px;color:var(--text-muted);padding:16px;border:1px dashed #1a1a1a;">No 2-member teams yet.</div>
+        </div>
+      </div>
+
+      <!-- Solo Teams -->
+      <div id="dir-section-solo">
+        <div style="font-family:'Space Mono';font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--yellow);border-bottom:2px dashed #222;padding-bottom:8px;margin-bottom:16px;">
+          ◈ Solo Participants <span id="dir-solo-count" style="color:var(--text-dim);font-weight:400;">(0)</span>
+        </div>
+        <div id="dir-solo-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+          <div style="font-family:'Space Mono';font-size:11px;color:var(--text-muted);padding:16px;border:1px dashed #1a1a1a;">No solo participants yet.</div>
+        </div>
       </div>
     </div>
 
@@ -798,6 +837,7 @@
       </div>
       <label class="control-label">Quick Create Team Size</label>
       <div class="team-size-row" id="quickSizeBtns" style="margin-bottom:20px;">
+        <button class="size-btn" onclick="setQuickSize(1)">1 Member</button>
         <button class="size-btn" onclick="setQuickSize(2)">2 Members</button>
         <button class="size-btn active" onclick="setQuickSize(3)">3 Members</button>
         <button class="size-btn" onclick="setQuickSize(4)">4 Members</button>
@@ -1642,12 +1682,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setTeamSize(n) {
   currentTeamSize = n;
-  document.querySelectorAll('#teamSizeBtns .size-btn').forEach((b, i) => b.classList.toggle('active', [2,3,4,5][i] === n));
+  document.querySelectorAll('#teamSizeBtns .size-btn').forEach((b, i) => b.classList.toggle('active', [1,2,3,4,5][i] === n));
   renderRosterFields();
 }
 function setQuickSize(n) {
   quickTeamSize = n;
-  document.querySelectorAll('#quickSizeBtns .size-btn').forEach((b, i) => b.classList.toggle('active', [2,3,4,5][i] === n));
+  document.querySelectorAll('#quickSizeBtns .size-btn').forEach((b, i) => b.classList.toggle('active', [1,2,3,4,5][i] === n));
 }
 
 function renderRosterFields() {
@@ -2019,6 +2059,62 @@ function removeMemberNode(ti, mi) {
   database.ref('systemTeams').set(systemTeams);
 }
 
+function renderTeamDirectory() {
+  const trioList = document.getElementById('dir-trio-list');
+  const duoList  = document.getElementById('dir-duo-list');
+  const soloList = document.getElementById('dir-solo-list');
+  const trioCnt  = document.getElementById('dir-trio-count');
+  const duoCnt   = document.getElementById('dir-duo-count');
+  const soloCnt  = document.getElementById('dir-solo-count');
+  const totalBadge = document.getElementById('team-dir-count-badge');
+  if (!trioList) return;
+
+  const trios = [], duos = [], solos = [];
+  systemTeams.forEach(team => {
+    const mLen = team.members ? team.members.length : 0;
+    const max  = team.maxSize || mLen || 3;
+    const effective = Math.max(mLen, max);
+    if (effective >= 3) trios.push(team);
+    else if (effective === 2) duos.push(team);
+    else solos.push(team);
+  });
+
+  if (totalBadge) totalBadge.textContent = `${systemTeams.length} Team${systemTeams.length !== 1 ? 's' : ''}`;
+  if (trioCnt) trioCnt.textContent = `(${trios.length})`;
+  if (duoCnt)  duoCnt.textContent  = `(${duos.length})`;
+  if (soloCnt) soloCnt.textContent = `(${solos.length})`;
+
+  function buildCard(team, slots) {
+    const members = team.members || [];
+    let rows = '';
+    for (let i = 0; i < slots; i++) {
+      const name = members[i] || '—';
+      const filled = !!members[i];
+      rows += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1a1a1a;">
+        <span style="font-family:'Space Mono';font-size:10px;color:var(--text-dim);width:56px;flex-shrink:0;">Member ${i+1}</span>
+        <span style="font-size:13px;color:${filled ? '#fff' : '#333'};font-weight:${filled ? '700' : '400'};">${filled ? name : 'Empty Slot'}</span>
+      </div>`;
+    }
+    return `<div style="background:#0a0a0a;border:2px solid #1a1a1a;padding:16px;box-shadow:4px 4px 0 #000;">
+      <div style="font-family:'Space Grotesk';font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">${team.name || 'Unnamed'}</div>
+      <div style="font-family:'Space Mono';font-size:10px;color:var(--accent);margin-bottom:12px;">Code: ${team.id || '—'}</div>
+      ${rows}
+    </div>`;
+  }
+
+  trioList.innerHTML = trios.length
+    ? trios.map(t => buildCard(t, 3)).join('')
+    : '<div style="font-family:\'Space Mono\';font-size:11px;color:var(--text-muted);padding:16px;border:1px dashed #1a1a1a;">No 3-member teams yet.</div>';
+
+  duoList.innerHTML = duos.length
+    ? duos.map(t => buildCard(t, 2)).join('')
+    : '<div style="font-family:\'Space Mono\';font-size:11px;color:var(--text-muted);padding:16px;border:1px dashed #1a1a1a;">No 2-member teams yet.</div>';
+
+  soloList.innerHTML = solos.length
+    ? solos.map(t => buildCard(t, 1)).join('')
+    : '<div style="font-family:\'Space Mono\';font-size:11px;color:var(--text-muted);padding:16px;border:1px dashed #1a1a1a;">No solo participants yet.</div>';
+}
+
 function refreshTeamRegistryViews() {
   const log   = document.getElementById("registeredTeamsLog");
   const sel   = document.getElementById("targetTeamSelector");
@@ -2080,6 +2176,7 @@ function refreshTeamRegistryViews() {
   }
   renderFirstTimeAccessLedger();
   detectLoginSize();
+  renderTeamDirectory();
 }
 
 function exportSingleTeam(idx) {
