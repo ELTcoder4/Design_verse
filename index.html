@@ -758,14 +758,29 @@
     </div>
 
     <div class="brutalist-card">
-      <div class="card-header-mono">Main Event Countdown Clock Control</div>
+      <div class="card-header-mono">
+        <span>Main Event Countdown Clock</span>
+        <span class="tag tag-green" style="font-size:9px;">⚡ SERVER TIMESTAMP — works when site is closed</span>
+      </div>
       <div style="display:flex;align-items:center;gap:16px;margin-top:12px;background:#000;padding:20px;border:2px solid var(--border-dark);">
         <button class="btn-action" onclick="adjustGlobalTime(-15)">-15m</button>
         <button class="btn-action" onclick="adjustGlobalTime(-60)">-1h</button>
-        <div style="font-family:'Space Mono';font-size:38px;font-weight:700;color:var(--accent);flex:1;text-align:center;letter-spacing:.05em;" id="adminClockDisplay">71:57:39</div>
+        <div style="font-family:'Space Mono';font-size:38px;font-weight:700;color:var(--accent);flex:1;text-align:center;letter-spacing:.05em;" id="adminClockDisplay">--:--:--</div>
         <button class="btn-action" onclick="adjustGlobalTime(60)">+1h</button>
         <button class="btn-action" onclick="adjustGlobalTime(15)">+15m</button>
       </div>
+      <div style="display:flex;gap:12px;align-items:flex-end;margin-top:14px;flex-wrap:wrap;">
+        <div class="control-group" style="margin:0;flex:1;min-width:160px;">
+          <label class="control-label">Set Hours Remaining</label>
+          <input type="number" id="setTimerHours" class="input-field mono" placeholder="e.g. 24" min="0" max="999" style="padding:10px 14px;">
+        </div>
+        <div class="control-group" style="margin:0;width:100px;">
+          <label class="control-label">Minutes</label>
+          <input type="number" id="setTimerMins" class="input-field mono" placeholder="0" min="0" max="59" style="padding:10px 14px;">
+        </div>
+        <button class="btn-accent-sm" onclick="applyCustomTimer()" style="height:46px;padding:0 20px;white-space:nowrap;">⏱ Set &amp; Save</button>
+      </div>
+      <div style="margin-top:10px;font-family:'Space Mono';font-size:10px;color:#444;" id="timerEndLabel">End time: not set</div>
     </div>
 
     <div class="brutalist-card">
@@ -808,7 +823,10 @@
     </div>
 
     <div class="span-full brutalist-card">
-      <div class="card-header-mono">Submitted Solutions Vault (.ZIP Files)</div>
+      <div class="card-header-mono">
+        <span>📦 Submitted Solutions Vault (ZIP + Drive Links)</span>
+        <span class="tag tag-green" id="zipVaultCount">0 Submissions</span>
+      </div>
       <div class="data-list" id="adminZipRepository">
         <div style="text-align:center;padding:48px;font-family:'Space Mono';font-size:12px;color:var(--text-muted);">Awaiting team design solutions to be uploaded from student work areas...</div>
       </div>
@@ -948,6 +966,28 @@
           <textarea class="code-area" id="editorJs" spellcheck="false">console.log("Team creative environment loaded successfully.");</textarea>
         </div>
       </div>
+      <div style="margin-top:24px;padding-top:20px;border-top:2px dashed #222;">
+        <div style="font-family:'Space Mono';font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">📎 Attach Supporting Files</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📹 Demo Video Drive Link (optional)</label>
+            <input type="url" id="codeDriveVideo" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📊 PPT Drive Link (optional)</label>
+            <input type="url" id="codeDrivePpt" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+        <div class="control-group" style="margin-bottom:0;">
+          <label class="control-label" style="color:var(--accent);">📦 Upload ZIP File (optional, max 5MB)</label>
+          <div class="drop-zone" id="codeZipZone" style="border-color:#333;">
+            <input type="file" id="codeZipInput" accept=".zip" onchange="handleZipUpload('code', event)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>Drop .zip here or <span style="color:var(--accent);">click to browse</span></div>
+            <div id="codeZipStatus" style="font-size:10px;color:#555;margin-top:4px;">No file selected</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="submission-tab-panel" id="tabPanel-figma">
@@ -955,7 +995,7 @@
         <div class="crosshair-decor" style="top:14px;right:14px;"></div>
         <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--blue);letter-spacing:.1em;margin-bottom:6px;">🎨 Figma Design Link</div>
         <h3 style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:6px;">Submit Your Figma Prototype</h3>
-        <p style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';margin-bottom:20px;">Paste your Figma share link below. It will be sent directly to the organizers' admin vault for judging access.</p>
+        <p style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';margin-bottom:20px;">Paste your Figma share link and optionally upload your project ZIP + Drive video/PPT links.</p>
         <div class="error-message" id="figmaError"></div>
         <div class="success-message" id="figmaSuccess"></div>
         <div class="figma-input-row">
@@ -963,11 +1003,28 @@
             <label class="control-label" style="color:var(--blue);">Figma Share URL</label>
             <input type="url" id="figmaLinkInput" class="input-field mono" placeholder="https://www.figma.com/proto/..." style="border-color:#1c1c3a;">
           </div>
-          <button class="btn-accent-sm" style="background:var(--blue);border-color:#000;color:#fff;height:50px;padding:0 24px;white-space:nowrap;flex-shrink:0;" onclick="submitFigmaLink()">
-            📎 Submit Link
-          </button>
+          <button class="btn-accent-sm" style="background:var(--blue);border-color:#000;color:#fff;height:50px;padding:0 24px;white-space:nowrap;flex-shrink:0;" onclick="submitFigmaLink()">📎 Submit Link</button>
         </div>
-        <div style="margin-top:12px;font-family:'Space Mono';font-size:10px;color:#333;">Only share links are accepted — ensure the link has view access enabled before submitting.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;">
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📹 Demo Video Drive Link (optional)</label>
+            <input type="url" id="figmaDriveVideo" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📊 PPT Drive Link (optional)</label>
+            <input type="url" id="figmaDrivePpt" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+        <div class="control-group" style="margin-top:14px;margin-bottom:0;">
+          <label class="control-label" style="color:var(--accent);">📦 Upload ZIP File (optional, max 5MB)</label>
+          <div class="drop-zone" id="figmaZipZone" style="border-color:#333;">
+            <input type="file" id="figmaZipInput" accept=".zip" onchange="handleZipUpload('figma', event)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>Drop .zip here or <span style="color:var(--accent);">click to browse</span></div>
+            <div id="figmaZipStatus" style="font-size:10px;color:#555;margin-top:4px;">No file selected</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-family:'Space Mono';font-size:10px;color:#333;">Figma link is required. Drive links and ZIP are optional but recommended for judging.</div>
       </div>
     </div>
 
@@ -976,7 +1033,7 @@
         <div class="crosshair-decor" style="top:14px;right:14px;"></div>
         <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--blue);letter-spacing:.1em;margin-bottom:6px;">⚛️ React.js Project</div>
         <h3 style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:6px;">Submit Your React.js Build</h3>
-        <p style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';margin-bottom:20px;">Paste your GitHub repository link or deployed app link (Vercel, Netlify, etc).</p>
+        <p style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';margin-bottom:20px;">Paste your GitHub repo or deployed link, and optionally share demo video, PPT, and ZIP.</p>
         <div class="error-message" id="reactError"></div>
         <div class="success-message" id="reactSuccess"></div>
         <div class="figma-input-row">
@@ -984,15 +1041,31 @@
             <label class="control-label" style="color:var(--blue);">Repository / Deployed Link</label>
             <input type="url" id="reactLinkInput" class="input-field mono" placeholder="https://github.com/... or https://your-app.vercel.app" style="border-color:#1c1c3a;">
           </div>
-          <button class="btn-accent-sm" style="background:var(--blue);border-color:#000;color:#fff;height:50px;padding:0 24px;white-space:nowrap;flex-shrink:0;" onclick="submitTechSubmission('React.js','reactLinkInput','reactNotesInput','reactError','reactSuccess')">
-            📎 Submit Link
-          </button>
+          <button class="btn-accent-sm" style="background:var(--blue);border-color:#000;color:#fff;height:50px;padding:0 24px;white-space:nowrap;flex-shrink:0;" onclick="submitTechSubmission('React.js','reactLinkInput','reactNotesInput','reactError','reactSuccess','reactDriveVideo','reactDrivePpt','reactZipInput')">📎 Submit</button>
         </div>
         <div class="control-group" style="margin-top:14px;margin-bottom:0;">
           <label class="control-label">Additional Notes (optional)</label>
           <input type="text" id="reactNotesInput" class="input-field mono" placeholder="e.g., deployed via Vercel, uses Redux">
         </div>
-        <div style="margin-top:12px;font-family:'Space Mono';font-size:10px;color:#333;">Make sure the repository or deployment is publicly accessible before submitting.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;">
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📹 Demo Video Drive Link (optional)</label>
+            <input type="url" id="reactDriveVideo" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📊 PPT Drive Link (optional)</label>
+            <input type="url" id="reactDrivePpt" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+        <div class="control-group" style="margin-top:14px;margin-bottom:0;">
+          <label class="control-label" style="color:var(--accent);">📦 Upload ZIP File (optional, max 5MB)</label>
+          <div class="drop-zone" id="reactZipZone" style="border-color:#333;">
+            <input type="file" id="reactZipInput" accept=".zip" onchange="handleZipUpload('react', event)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>Drop .zip here or <span style="color:var(--accent);">click to browse</span></div>
+            <div id="reactZipStatus" style="font-size:10px;color:#555;margin-top:4px;">No file selected</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1001,7 +1074,7 @@
         <div class="crosshair-decor" style="top:14px;right:14px;"></div>
         <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--blue);letter-spacing:.1em;margin-bottom:6px;">▲ Next.js Project</div>
         <h3 style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:6px;">Submit Your Next.js Build</h3>
-        <p style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';margin-bottom:20px;">Paste your GitHub repository link or deployed app link (Vercel, Netlify, etc).</p>
+        <p style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';margin-bottom:20px;">Paste your GitHub repo or deployed link, and optionally share demo video, PPT, and ZIP.</p>
         <div class="error-message" id="nextError"></div>
         <div class="success-message" id="nextSuccess"></div>
         <div class="figma-input-row">
@@ -1009,15 +1082,31 @@
             <label class="control-label" style="color:var(--blue);">Repository / Deployed Link</label>
             <input type="url" id="nextLinkInput" class="input-field mono" placeholder="https://github.com/... or https://your-app.vercel.app" style="border-color:#1c1c3a;">
           </div>
-          <button class="btn-accent-sm" style="background:var(--blue);border-color:#000;color:#fff;height:50px;padding:0 24px;white-space:nowrap;flex-shrink:0;" onclick="submitTechSubmission('Next.js','nextLinkInput','nextNotesInput','nextError','nextSuccess')">
-            📎 Submit Link
-          </button>
+          <button class="btn-accent-sm" style="background:var(--blue);border-color:#000;color:#fff;height:50px;padding:0 24px;white-space:nowrap;flex-shrink:0;" onclick="submitTechSubmission('Next.js','nextLinkInput','nextNotesInput','nextError','nextSuccess','nextDriveVideo','nextDrivePpt','nextZipInput')">📎 Submit</button>
         </div>
         <div class="control-group" style="margin-top:14px;margin-bottom:0;">
           <label class="control-label">Additional Notes (optional)</label>
           <input type="text" id="nextNotesInput" class="input-field mono" placeholder="e.g., uses App Router, deployed via Vercel">
         </div>
-        <div style="margin-top:12px;font-family:'Space Mono';font-size:10px;color:#333;">Make sure the repository or deployment is publicly accessible before submitting.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;">
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📹 Demo Video Drive Link (optional)</label>
+            <input type="url" id="nextDriveVideo" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📊 PPT Drive Link (optional)</label>
+            <input type="url" id="nextDrivePpt" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+        <div class="control-group" style="margin-top:14px;margin-bottom:0;">
+          <label class="control-label" style="color:var(--accent);">📦 Upload ZIP File (optional, max 5MB)</label>
+          <div class="drop-zone" id="nextZipZone" style="border-color:#333;">
+            <input type="file" id="nextZipInput" accept=".zip" onchange="handleZipUpload('next', event)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>Drop .zip here or <span style="color:var(--accent);">click to browse</span></div>
+            <div id="nextZipStatus" style="font-size:10px;color:#555;margin-top:4px;">No file selected</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1026,7 +1115,7 @@
         <div class="crosshair-decor" style="top:14px;right:14px;"></div>
         <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--blue);letter-spacing:.1em;margin-bottom:6px;">📦 Other Submission</div>
         <h3 style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:6px;">Submit Any Other Project Type</h3>
-        <p style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';margin-bottom:20px;">Used a different stack (Vue, Flutter, mobile, etc)? Paste your repo or deployed link below.</p>
+        <p style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';margin-bottom:20px;">Used a different stack (Vue, Flutter, mobile, etc)? Paste your repo or deployed link, plus video, PPT, and ZIP.</p>
         <div class="error-message" id="otherError"></div>
         <div class="success-message" id="otherSuccess"></div>
         <div class="figma-input-row">
@@ -1034,15 +1123,31 @@
             <label class="control-label" style="color:var(--blue);">Repository / Deployed Link</label>
             <input type="url" id="otherLinkInput" class="input-field mono" placeholder="https://github.com/... or https://your-deployed-app.com" style="border-color:#1c1c3a;">
           </div>
-          <button class="btn-accent-sm" style="background:var(--blue);border-color:#000;color:#fff;height:50px;padding:0 24px;white-space:nowrap;flex-shrink:0;" onclick="submitTechSubmission('Other','otherLinkInput','otherNotesInput','otherError','otherSuccess')">
-            📎 Submit Link
-          </button>
+          <button class="btn-accent-sm" style="background:var(--blue);border-color:#000;color:#fff;height:50px;padding:0 24px;white-space:nowrap;flex-shrink:0;" onclick="submitTechSubmission('Other','otherLinkInput','otherNotesInput','otherError','otherSuccess','otherDriveVideo','otherDrivePpt','otherZipInput')">📎 Submit</button>
         </div>
         <div class="control-group" style="margin-top:14px;margin-bottom:0;">
           <label class="control-label">Tech Stack / Additional Notes</label>
           <input type="text" id="otherNotesInput" class="input-field mono" placeholder="e.g., built with Flutter, deployed on Firebase Hosting">
         </div>
-        <div style="margin-top:12px;font-family:'Space Mono';font-size:10px;color:#333;">Make sure the repository or deployment is publicly accessible before submitting.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;">
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📹 Demo Video Drive Link (optional)</label>
+            <input type="url" id="otherDriveVideo" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+          <div class="control-group" style="margin-bottom:0;">
+            <label class="control-label" style="color:var(--yellow);">📊 PPT Drive Link (optional)</label>
+            <input type="url" id="otherDrivePpt" class="input-field mono" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+        <div class="control-group" style="margin-top:14px;margin-bottom:0;">
+          <label class="control-label" style="color:var(--accent);">📦 Upload ZIP File (optional, max 5MB)</label>
+          <div class="drop-zone" id="otherZipZone" style="border-color:#333;">
+            <input type="file" id="otherZipInput" accept=".zip" onchange="handleZipUpload('other', event)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>Drop .zip here or <span style="color:var(--accent);">click to browse</span></div>
+            <div id="otherZipStatus" style="font-size:10px;color:#555;margin-top:4px;">No file selected</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1282,8 +1387,9 @@ curtainEl.addEventListener('click', openCurtain);
 curtainEl.addEventListener('touchstart', openCurtain, { passive: true });
 
 /* ══ STATE ══ */
-let timeInSeconds = 71 * 3600 + 57 * 60 + 39;
+let hackathonEndsAt = null;   // ISO timestamp stored in Firebase — the single source of truth
 let currentTimerInterval = null;
+let timeInSeconds = 0;        // computed locally every second from hackathonEndsAt - Date.now()
 let activeAdminUser = null;
 let authenticatedStudentTeam = null;
 let isProblemRevealed = false;
@@ -1567,35 +1673,38 @@ function renderRosterFields() {
 }
 
 function detectLoginSize() {
-  const val  = document.getElementById('studTeamNo').value.trim().toLowerCase();
-  const code = document.getElementById('studEventId').value.trim().toLowerCase();
-  const match = systemTeams.find(t => (t.name && t.name.toLowerCase() === val) || (t.id && t.id.toLowerCase() === val) || (t.id && t.id.toLowerCase() === code));
-  
-  if (match && match.members && match.members.length > 0) {
-    buildLoginFields(match.members.length);
-  } else {
-    buildLoginFields(0);
-  }
+  const teamVal = document.getElementById('studTeamNo').value.trim().toLowerCase();
+  const codeVal = document.getElementById('studEventId').value.trim().toLowerCase();
+
+  // Find team by 5-digit code first (most precise), then fall back to team name
+  const match = systemTeams.find(t => t.id && t.id.toLowerCase() === codeVal)
+             || systemTeams.find(t => t.name && t.name.toLowerCase() === teamVal);
+
+  const count = (match && match.members) ? match.members.length : 0;
+  buildLoginFields(count);
 }
 
 function buildLoginFields(count) {
-  const c = document.getElementById('loginMemberFields');
+  const c   = document.getElementById('loginMemberFields');
   const lbl = document.getElementById('loginMemberLabel');
   if (!c) return;
-  
+
+  // Always rebuild fresh
+  c.innerHTML = '';
+
   if (count === 0) {
-    c.innerHTML = '';
-    if (lbl) lbl.textContent = "Verify Your Team Members (No roster assigned yet — fields bypassed)";
+    if (lbl) lbl.textContent = 'Enter your team name & 5-digit code above — member name fields will appear automatically.';
     return;
   }
-  
-  if (c.querySelectorAll('input').length === count) return;
-  c.innerHTML = '';
-  if (lbl) lbl.textContent = `Verify Your Team Members (Enter All ${count} Names)`;
+
+  const sizeLabel = count === 1 ? 'Solo (1 member)' : count === 2 ? 'Duo (2 members)' : count === 3 ? 'Trio (3 members)' : `${count} Members`;
+  if (lbl) lbl.textContent = `${sizeLabel} detected — enter all ${count} name${count > 1 ? 's' : ''} exactly as registered`;
+
   for (let i = 0; i < count; i++) {
     const inp = document.createElement('input');
-    inp.type = 'text'; inp.className = 'input-field';
-    inp.placeholder = `Member ${i+1} Full Name`;
+    inp.type = 'text';
+    inp.className = 'input-field';
+    inp.placeholder = `Member ${i + 1} Full Name`;
     c.appendChild(inp);
   }
 }
@@ -1623,31 +1732,35 @@ function handleWorkspaceTabRouting(portalKey) {
 }
 
 function attemptStudentLogin() {
-  const teamNoVal  = document.getElementById("studTeamNo").value.trim().toLowerCase();
-  const eventIdVal = document.getElementById("studEventId").value.trim().toLowerCase();
-  const errorBox   = document.getElementById("studentLoginError");
+  const teamNoVal  = document.getElementById('studTeamNo').value.trim().toLowerCase();
+  const eventIdVal = document.getElementById('studEventId').value.trim().toLowerCase();
+  const errorBox   = document.getElementById('studentLoginError');
   const memberInputs = Array.from(document.querySelectorAll('#loginMemberFields input'));
   const memberVals = memberInputs.map(el => el.value.trim().toLowerCase());
 
+  errorBox.style.display = 'none';
+
   if (!teamNoVal || !eventIdVal) {
-    errorBox.innerText = "⚠️ Missing Fields: Please enter your team details.";
-    errorBox.style.display = "block"; return;
+    errorBox.innerText = '⚠️ Please enter your team name and 5-digit code.';
+    errorBox.style.display = 'block'; return;
   }
 
   const match = systemTeams.find(t => {
-    const idMatch      = (t.name && t.name.toLowerCase() === teamNoVal) || (t.id && t.id.toLowerCase() === teamNoVal);
-    const tokenMatch   = t.id && t.id.toLowerCase() === eventIdVal;
-    
-    const roster       = t.members ? t.members.map(m => m.toLowerCase().trim()) : [];
-    let membersMatch = false;
-    
-    if (roster.length === 0) {
-      membersMatch = true;
-    } else {
-      membersMatch = memberVals.length === roster.length && memberVals.every(v => v && roster.includes(v));
-    }
-    
-    return idMatch && tokenMatch && membersMatch;
+    // Team name AND code must both match
+    const nameMatch = t.name && t.name.toLowerCase() === teamNoVal;
+    const codeMatch = t.id   && t.id.toLowerCase()   === eventIdVal;
+    if (!nameMatch || !codeMatch) return false;
+
+    const roster = t.members ? t.members.map(m => m.toLowerCase().trim()) : [];
+
+    // No roster saved — let them in with name + code only
+    if (roster.length === 0) return true;
+
+    // Must fill exactly as many fields as members in the roster
+    if (memberVals.length !== roster.length) return false;
+
+    // Every field non-empty and must exist in roster (any order)
+    return memberVals.every(v => v.length > 0 && roster.includes(v));
   });
 
   if (match) {
@@ -1672,9 +1785,13 @@ function attemptStudentLogin() {
     document.getElementById("studTeamNo").value = "";
     document.getElementById("studEventId").value = "";
     memberInputs.forEach(el => el.value = "");
+    // Restore editor from localStorage if a previous session existed
+    restoreEditorFromLocal(match.id);
+    // Attach auto-save so every keystroke saves to localStorage
+    attachEditorAutoSave();
     handleWorkspaceTabRouting('user');
   } else {
-    errorBox.innerText = "⚠️ Match Failed: The combination of team details, code, and member names doesn't match our list.";
+    errorBox.innerText = "⚠️ Match Failed: Team name / code not found, or one of the entered names doesn't match the registered roster. Check spelling and try again.";
     errorBox.style.display = "block";
   }
 }
@@ -1801,29 +1918,68 @@ function logoutAdmin() {
   refreshTeamRegistryViews(); handleWorkspaceTabRouting('user');
 }
 
+/* ══ TIMESTAMP-BASED TIMER (Option B) ══════════════════════════
+   Firebase stores hackathonEndsAt: an ISO end-time string.
+   Every client independently counts down to that moment.
+   Timer works even if every browser is closed — no server needed.
+   Admin sets/adjusts the end time; it is saved once to Firebase.
+═══════════════════════════════════════════════════════════════ */
 function startGlobalChronometer() {
   if (currentTimerInterval) clearInterval(currentTimerInterval);
-  currentTimerInterval = setInterval(() => { 
-    if (timeInSeconds > 0 && activeAdminUser) { 
-      timeInSeconds--; 
-      database.ref('timeInSeconds').set(timeInSeconds);
-    } 
+  currentTimerInterval = setInterval(() => {
+    if (hackathonEndsAt) {
+      const remaining = Math.max(0, Math.round((new Date(hackathonEndsAt) - Date.now()) / 1000));
+      timeInSeconds = remaining;
+      renderChronometerDisplays();
+    }
   }, 1000);
 }
-function adjustGlobalTime(m) { 
-  timeInSeconds = Math.max(0, timeInSeconds + m * 60); 
-  database.ref('timeInSeconds').set(timeInSeconds);
+
+function adjustGlobalTime(deltaMinutes) {
+  const currentEnd = hackathonEndsAt ? new Date(hackathonEndsAt) : new Date();
+  const newEnd = new Date(currentEnd.getTime() + deltaMinutes * 60 * 1000);
+  hackathonEndsAt = newEnd.toISOString();
+  database.ref('hackathonEndsAt').set(hackathonEndsAt);
+  updateTimerEndLabel();
+  showSyncToast(`⏱ Timer ${deltaMinutes > 0 ? '+' : ''}${deltaMinutes}m — saved to Firebase`);
 }
+
+function setTimerFromSeconds(totalSeconds) {
+  // Helper: set end time = now + totalSeconds
+  const newEnd = new Date(Date.now() + totalSeconds * 1000);
+  hackathonEndsAt = newEnd.toISOString();
+  database.ref('hackathonEndsAt').set(hackathonEndsAt);
+}
+
 function renderChronometerDisplays() {
-  const h = Math.floor(timeInSeconds/3600), m = Math.floor((timeInSeconds%3600)/60), s = timeInSeconds%60;
+  const secs = Math.max(0, timeInSeconds);
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
   const f = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   const d1 = document.getElementById("adminClockDisplay");
   const d2 = document.getElementById("workspaceClockDisplay");
-  if(d1) d1.innerText = f;
-  if(d2) d2.innerText = f;
+  if (d1) d1.innerText = f;
+  if (d2) d2.innerText = f;
 }
 
-function triggerAutoTokenGen() { document.getElementById("newEventId").value = Math.floor(10000 + Math.random() * 90000); }
+function applyCustomTimer() {
+  const h = parseInt(document.getElementById('setTimerHours')?.value || 0) || 0;
+  const m = parseInt(document.getElementById('setTimerMins')?.value  || 0) || 0;
+  const total = h * 3600 + m * 60;
+  if (total <= 0) { showSyncToast('⚠️ Enter a valid duration', 'var(--red)'); return; }
+  setTimerFromSeconds(total);
+  showSyncToast(`⏱ Timer set to ${h}h ${m}m — saved to Firebase`);
+  updateTimerEndLabel();
+}
+
+function updateTimerEndLabel() {
+  const el = document.getElementById('timerEndLabel');
+  if (!el || !hackathonEndsAt) return;
+  const end = new Date(hackathonEndsAt);
+  el.textContent = `End time: ${end.toLocaleString()} (stored in Firebase — works when site is closed)`;
+  el.style.color = '#666';
+}
 
 function commitTeamToRegistry() {
   const nameEl = document.getElementById("newTeamName"), idEl = document.getElementById("newEventId");
@@ -1977,19 +2133,77 @@ function setupNoCopyConstraints() {
   });
 }
 
+/* ══ LOCALSTORAGE AUTO-SAVE FOR CODE EDITORS ══════════════════
+   Saves editor content on every keystroke.
+   Keyed by team ID so different teams on same device don't clash.
+   Survives accidental refresh/tab close — restores automatically on login.
+════════════════════════════════════════════════════════════════ */
+function editorStorageKey(teamId) {
+  return `dv_editor_${teamId}`;
+}
+
+function saveEditorToLocal() {
+  if (!authenticatedStudentTeam) return;
+  const key = editorStorageKey(authenticatedStudentTeam.id);
+  const data = {
+    html: document.getElementById('editorIndex')?.value || '',
+    css:  document.getElementById('editorStyle')?.value  || '',
+    js:   document.getElementById('editorJs')?.value     || '',
+    savedAt: new Date().toLocaleTimeString()
+  };
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch(e) { /* storage full — fail silently */ }
+}
+
+function restoreEditorFromLocal(teamId) {
+  try {
+    const raw = localStorage.getItem(editorStorageKey(teamId));
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data.html !== undefined) document.getElementById('editorIndex').value = data.html;
+    if (data.css  !== undefined) document.getElementById('editorStyle').value  = data.css;
+    if (data.js   !== undefined) document.getElementById('editorJs').value     = data.js;
+    showSyncToast(`💾 Editor restored from local save (${data.savedAt || 'earlier session'})`);
+    return true;
+  } catch(e) { return false; }
+}
+
+function clearEditorLocal(teamId) {
+  try { localStorage.removeItem(editorStorageKey(teamId)); } catch(e) {}
+}
+
+function attachEditorAutoSave() {
+  ['editorIndex','editorStyle','editorJs'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', saveEditorToLocal);
+  });
+}
+
 function triggerPermanentSubmitDialog() { document.getElementById("confirmSubmitDialog").classList.add("active"); }
 function dismissSubmitDialog() { document.getElementById("confirmSubmitDialog").classList.remove("active"); }
 function executeFinalPublishChain() {
   dismissSubmitDialog();
   const tName = authenticatedStudentTeam?.name || "Unknown_Team";
   const tId   = authenticatedStudentTeam?.id   || "00000";
+  const zipMeta = pendingZipData['code'] || null;
   const newZip = { 
     fileName:`${tName.replace(/\s+/g,'_')}_ID_${tId}_Build.zip`, 
-    time:new Date().toLocaleTimeString(), 
-    htmlLength:document.getElementById("editorIndex").value.length 
+    teamName: tName,
+    teamId: tId,
+    time:new Date().toLocaleTimeString(),
+    htmlLength:document.getElementById("editorIndex").value.length,
+    driveVideo: (document.getElementById("codeDriveVideo")?.value || '').trim(),
+    drivePpt: (document.getElementById("codeDrivePpt")?.value || '').trim(),
+    zipFileName: zipMeta ? zipMeta.name : '',
+    zipData: zipMeta ? zipMeta.data : ''
   };
   
   database.ref('loggedSubmissionsZip').push(newZip);
+  // Clear local editor save after successful submission
+  if (authenticatedStudentTeam) clearEditorLocal(authenticatedStudentTeam.id);
+  delete pendingZipData['code'];
   navigate('thank-you');
 }
 
@@ -2000,11 +2214,71 @@ function renderAdminZipRepository() {
     c.innerHTML = `<div style="text-align:center;padding:48px;font-family:'Space Mono';font-size:12px;color:var(--text-muted);">Awaiting team design solutions...</div>`;
     return;
   }
-  loggedSubmissionsZip.forEach(a => {
+  loggedSubmissionsZip.forEach((a, i) => {
     const el = document.createElement("div"); el.className = "zip-item";
-    el.innerHTML = `<div><span style="color:var(--accent);font-weight:700;">📦 ${a.fileName}</span><div style="font-size:11px;color:var(--text-dim);margin-top:2px;font-family:'Space Mono';">Uploaded at ${a.time}</div></div><button class="btn-accent-sm" onclick="alert('Downloading...')">Download ZIP</button>`;
+    el.style.flexDirection = 'column'; el.style.gap = '10px';
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;flex-wrap:wrap;gap:8px;">
+        <div>
+          <span style="color:var(--accent);font-weight:700;font-family:'Space Mono';">📦 ${escHtml(a.fileName || '')}</span>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:2px;font-family:'Space Mono';">By ${escHtml(a.teamName||'')} · Submitted ${escHtml(a.time||'')}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${a.zipData ? `<button class="btn-accent-sm" style="font-size:10px;padding:8px 14px;" onclick="downloadZipFromBase64('${escHtml(a.fileName||'')}', '${i}', 'zip')">⬇ Download ZIP</button>` : ''}
+          ${a.driveVideo ? `<a href="${escHtml(a.driveVideo)}" target="_blank" class="btn-action" style="font-size:10px;padding:8px 14px;text-decoration:none;">📹 Video</a>` : ''}
+          ${a.drivePpt ? `<a href="${escHtml(a.drivePpt)}" target="_blank" class="btn-action" style="font-size:10px;padding:8px 14px;text-decoration:none;">📊 PPT</a>` : ''}
+          <button class="btn-action" style="font-size:10px;padding:8px 14px;color:var(--red);border-color:var(--red);" onclick="deleteZipEntry(${i})">✕ Delete</button>
+        </div>
+      </div>`;
     c.appendChild(el);
   });
+  const badge = document.getElementById('zipVaultCount');
+  if(badge) badge.textContent = loggedSubmissionsZip.length + ' Submission' + (loggedSubmissionsZip.length !== 1 ? 's' : '');
+}
+
+/* ══ ZIP DOWNLOAD FROM BASE64 ══ */
+function downloadZipFromBase64(fileName, idx, type) {
+  let item;
+  if (type === 'zip') item = loggedSubmissionsZip[idx];
+  if (!item || !item.zipData) { alert('ZIP data not available.'); return; }
+  const byteStr = atob(item.zipData);
+  const buf = new ArrayBuffer(byteStr.length);
+  const view = new Uint8Array(buf);
+  for (let i = 0; i < byteStr.length; i++) view[i] = byteStr.charCodeAt(i);
+  const blob = new Blob([buf], { type: 'application/zip' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName; a.click();
+}
+
+function deleteZipEntry(index) {
+  if (!confirm('Delete this submission?')) return;
+  const target = loggedSubmissionsZip[index];
+  if (!target) return;
+  database.ref('loggedSubmissionsZip').once('value').then(snap => {
+    const fbData = snap.val();
+    if (!fbData) return;
+    const matchKey = Object.keys(fbData).find(k => fbData[k].teamName === target.teamName && fbData[k].time === target.time);
+    if (matchKey) database.ref('loggedSubmissionsZip/' + matchKey).remove();
+    showSyncToast('🗑 ZIP submission deleted.');
+  });
+}
+
+/* ══ ZIP UPLOAD HANDLER (base64 encode, max 5MB) ══ */
+const pendingZipData = {};
+function handleZipUpload(tab, event) {
+  const file = event.target.files[0];
+  const statusEl = document.getElementById(tab + 'ZipStatus');
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    if(statusEl) { statusEl.textContent = '⚠️ File too large (max 5MB)'; statusEl.style.color = 'var(--red)'; }
+    event.target.value = ''; return;
+  }
+  if(statusEl) { statusEl.textContent = '⏳ Reading ' + file.name + '...'; statusEl.style.color = 'var(--yellow)'; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    pendingZipData[tab] = { name: file.name, data: e.target.result.split(',')[1] };
+    if(statusEl) { statusEl.textContent = '✓ Ready: ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)'; statusEl.style.color = 'var(--accent)'; }
+  };
+  reader.readAsDataURL(file);
 }
 
 /* ══════════════════════════════════════════════
@@ -2032,17 +2306,24 @@ function submitFigmaLink() {
     errEl.style.display = 'block'; return;
   }
 
+  const driveVideo = (document.getElementById('figmaDriveVideo')?.value || '').trim();
+  const drivePpt   = (document.getElementById('figmaDrivePpt')?.value || '').trim();
+  const zipMeta    = pendingZipData['figma'] || null;
+
   const existingIdx = figmaSubmissions.findIndex(s => s.teamId === authenticatedStudentTeam.id);
   const payload = {
     teamName: authenticatedStudentTeam.name,
     teamId:   authenticatedStudentTeam.id,
     url,
+    driveVideo: driveVideo || '',
+    drivePpt:   drivePpt || '',
+    zipFileName: zipMeta ? zipMeta.name : '',
+    zipData:    zipMeta ? zipMeta.data : '',
     submittedAt:  new Date().toLocaleTimeString(),
     updatedAt:    new Date().toLocaleString()
   };
 
   if (existingIdx > -1) {
-    // Update existing submission — find Firebase key for this team's entry
     database.ref('figmaSubmissions').once('value').then(snap => {
       const fbData = snap.val();
       if (fbData) {
@@ -2058,9 +2339,10 @@ function submitFigmaLink() {
   okEl.textContent = `✓ Figma link submitted successfully for ${authenticatedStudentTeam.name}! Organizers can now access your design.`;
   okEl.style.display = 'block';
   input.value = '';
+  delete pendingZipData['figma'];
+  const statusEl = document.getElementById('figmaZipStatus');
+  if(statusEl) { statusEl.textContent = 'No file selected'; statusEl.style.color = '#555'; }
 
-  const btn = document.querySelector('[onclick="submitFigmaLink()"]');
-  if (btn) { btn.disabled = true; setTimeout(() => { btn.disabled = false; }, 3000); }
   showSyncToast(`🎨 Figma link received from ${authenticatedStudentTeam.name}`);
 }
 
@@ -2083,28 +2365,39 @@ function renderAdminFigmaVault() {
   if(statusEl) statusEl.textContent = `${figmaSubmissions.length} design link(s) received — last updated ${new Date().toLocaleTimeString()}`;
 
   list.innerHTML = figmaSubmissions.map((s, i) => `
-    <div class="figma-card">
-      <div>
-        <div class="figma-team-badge">${s.teamName || ''} — ID: ${s.teamId || ''}</div>
-      </div>
-      <div style="flex:1;">
-        <div class="figma-link-text">
-          <a href="${escHtml(s.url || '')}" target="_blank" rel="noopener">${escHtml(s.url || '')}</a>
+    <div class="figma-card" style="flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+        <div style="flex-shrink:0;"><div class="figma-team-badge">${escHtml(s.teamName || '')} — ID: ${escHtml(s.teamId || '')}</div></div>
+        <div style="flex:1;min-width:200px;">
+          <div class="figma-link-text"><a href="${escHtml(s.url || '')}" target="_blank" rel="noopener">${escHtml(s.url || '')}</a></div>
+          <div class="figma-meta">Submitted ${escHtml(s.submittedAt || '')} · Updated ${escHtml(s.updatedAt || '')}</div>
         </div>
-        <div class="figma-meta">Submitted at ${s.submittedAt || ''} &nbsp;·&nbsp; Last updated: ${s.updatedAt || ''}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;">
+          <a href="${escHtml(s.url || '')}" target="_blank" rel="noopener" style="padding:8px 14px;background:var(--blue);color:#fff;border:2px solid #000;font-family:'Space Mono';font-size:10px;font-weight:700;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">🔗 Figma</a>
+          ${s.driveVideo ? `<a href="${escHtml(s.driveVideo)}" target="_blank" rel="noopener" style="padding:8px 14px;background:#1a1a00;color:var(--yellow);border:2px solid #333;font-family:'Space Mono';font-size:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;">📹 Video</a>` : ''}
+          ${s.drivePpt ? `<a href="${escHtml(s.drivePpt)}" target="_blank" rel="noopener" style="padding:8px 14px;background:#1a1a00;color:var(--yellow);border:2px solid #333;font-family:'Space Mono';font-size:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;">📊 PPT</a>` : ''}
+          ${s.zipFileName ? `<button class="btn-action" style="font-size:10px;padding:8px 14px;color:var(--accent);border-color:var(--accent);" onclick="downloadFigmaZip(${i})">⬇ ZIP</button>` : ''}
+          <button class="btn-action" style="font-size:10px;padding:8px 14px;color:var(--red);border-color:var(--red);" onclick="removeFigmaEntry(${i})">✕ Delete</button>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;">
-        <a href="${escHtml(s.url || '')}" target="_blank" rel="noopener"
-           style="padding:8px 14px;background:var(--blue);color:#fff;border:2px solid #000;font-family:'Space Mono';font-size:10px;font-weight:700;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-          🔗 Open Figma
-        </a>
-        <button class="btn-action" style="font-size:10px;padding:8px 14px;" onclick="removeFigmaEntry(${i})">✕ Remove</button>
-      </div>
+      ${s.zipFileName ? `<div style="font-family:'Space Mono';font-size:10px;color:#555;padding:6px 10px;background:#0a0a0a;border:1px dashed #222;">📦 ZIP attached: ${escHtml(s.zipFileName)}</div>` : ''}
     </div>
   `).join('');
 }
 
+function downloadFigmaZip(index) {
+  const s = figmaSubmissions[index];
+  if (!s || !s.zipData) { alert('No ZIP file data stored for this entry.'); return; }
+  const byteStr = atob(s.zipData);
+  const buf = new ArrayBuffer(byteStr.length);
+  const view = new Uint8Array(buf);
+  for (let i = 0; i < byteStr.length; i++) view[i] = byteStr.charCodeAt(i);
+  const blob = new Blob([buf], { type: 'application/zip' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = s.zipFileName || 'submission.zip'; a.click();
+}
+
 function removeFigmaEntry(index) {
+  if (!confirm('Delete this Figma submission?')) return;
   const target = figmaSubmissions[index];
   if (!target) return;
   database.ref('figmaSubmissions').once('value').then(snap => {
@@ -2114,7 +2407,7 @@ function removeFigmaEntry(index) {
     if (matchKey) database.ref('figmaSubmissions/' + matchKey).remove();
     else { figmaSubmissions.splice(index, 1); database.ref('figmaSubmissions').set(figmaSubmissions.length ? figmaSubmissions : null); }
   });
-  showSyncToast('Figma entry removed.');
+  showSyncToast('🗑 Figma entry deleted.');
 }
 
 function escHtml(str) {
@@ -2133,7 +2426,7 @@ function switchSubmissionTab(tab) {
    TECH SUBMISSION VAULT — React.js / Next.js / Other
    Participant Submit + Admin View (mirrors Figma vault pattern)
 ══════════════════════════════════════════════ */
-function submitTechSubmission(category, inputId, notesId, errId, okId) {
+function submitTechSubmission(category, inputId, notesId, errId, okId, driveVideoId, drivePptId, zipInputId) {
   const input      = document.getElementById(inputId);
   const notesInput = document.getElementById(notesId);
   const errEl = document.getElementById(errId);
@@ -2144,6 +2437,10 @@ function submitTechSubmission(category, inputId, notesId, errId, okId) {
 
   const link  = (input?.value || '').trim();
   const notes = (notesInput?.value || '').trim();
+  const driveVideo = (document.getElementById(driveVideoId)?.value || '').trim();
+  const drivePpt   = (document.getElementById(drivePptId)?.value || '').trim();
+  const tabKey = category === 'React.js' ? 'react' : category === 'Next.js' ? 'next' : 'other';
+  const zipMeta = pendingZipData[tabKey] || null;
 
   if (!link) {
     errEl.textContent = `Please paste your ${category} project link before submitting.`;
@@ -2163,12 +2460,15 @@ function submitTechSubmission(category, inputId, notesId, errId, okId) {
     teamName: authenticatedStudentTeam.name,
     teamId:   authenticatedStudentTeam.id,
     category, link, notes,
+    driveVideo: driveVideo || '',
+    drivePpt:   drivePpt || '',
+    zipFileName: zipMeta ? zipMeta.name : '',
+    zipData:    zipMeta ? zipMeta.data : '',
     submittedAt: new Date().toLocaleTimeString(),
     updatedAt:   new Date().toLocaleString()
   };
 
   if (existingIdx > -1) {
-    // Update existing submission — find Firebase key for this team+category entry
     database.ref('techSubmissions').once('value').then(snap => {
       const fbData = snap.val();
       if (fbData) {
@@ -2185,6 +2485,9 @@ function submitTechSubmission(category, inputId, notesId, errId, okId) {
   okEl.style.display = 'block';
   input.value = '';
   if (notesInput) notesInput.value = '';
+  delete pendingZipData[tabKey];
+  const statusEl = document.getElementById(tabKey + 'ZipStatus');
+  if(statusEl) { statusEl.textContent = 'No file selected'; statusEl.style.color = '#555'; }
 
   const icon = category === 'React.js' ? '⚛️' : category === 'Next.js' ? '▲' : '📦';
   showSyncToast(`${icon} ${category} link received from ${authenticatedStudentTeam.name}`);
@@ -2212,29 +2515,43 @@ function renderAdminTechVault() {
   const catIcon  = c => c === 'React.js' ? '⚛️' : c === 'Next.js' ? '▲' : '📦';
 
   list.innerHTML = techSubmissions.map((s, i) => `
-    <div class="figma-card">
-      <div>
-        <div class="figma-team-badge">${s.teamName || ''} — ID: ${s.teamId || ''}</div>
-        <div class="tag" style="background:#000;border:1px solid ${catColor(s.category)};color:${catColor(s.category)};font-size:10px;margin-top:8px;width:fit-content;">${catIcon(s.category)} ${escHtml(s.category || '')}</div>
+    <div class="figma-card" style="flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+        <div style="flex-shrink:0;">
+          <div class="figma-team-badge">${escHtml(s.teamName || '')} — ID: ${escHtml(s.teamId || '')}</div>
+          <div class="tag" style="background:#000;border:1px solid ${catColor(s.category)};color:${catColor(s.category)};font-size:10px;margin-top:8px;width:fit-content;">${catIcon(s.category)} ${escHtml(s.category || '')}</div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div class="figma-link-text"><a href="${escHtml(s.link || '')}" target="_blank" rel="noopener">${escHtml(s.link || '')}</a></div>
+          ${s.notes ? `<div style="font-size:11px;color:var(--text-dim);margin-top:6px;">📝 ${escHtml(s.notes)}</div>` : ''}
+          <div class="figma-meta">Submitted ${escHtml(s.submittedAt || '')} · Updated ${escHtml(s.updatedAt || '')}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;">
+          <a href="${escHtml(s.link || '')}" target="_blank" rel="noopener" style="padding:8px 14px;background:var(--blue);color:#fff;border:2px solid #000;font-family:'Space Mono';font-size:10px;font-weight:700;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;">🔗 Open</a>
+          ${s.driveVideo ? `<a href="${escHtml(s.driveVideo)}" target="_blank" rel="noopener" style="padding:8px 14px;background:#1a1a00;color:var(--yellow);border:2px solid #333;font-family:'Space Mono';font-size:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;">📹 Video</a>` : ''}
+          ${s.drivePpt ? `<a href="${escHtml(s.drivePpt)}" target="_blank" rel="noopener" style="padding:8px 14px;background:#1a1a00;color:var(--yellow);border:2px solid #333;font-family:'Space Mono';font-size:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;">📊 PPT</a>` : ''}
+          ${s.zipFileName ? `<button class="btn-action" style="font-size:10px;padding:8px 14px;color:var(--accent);border-color:var(--accent);" onclick="downloadTechZip(${i})">⬇ ZIP</button>` : ''}
+          <button class="btn-action" style="font-size:10px;padding:8px 14px;color:var(--red);border-color:var(--red);" onclick="removeTechEntry(${i})">✕ Delete</button>
+        </div>
       </div>
-      <div style="flex:1;">
-        <div class="figma-link-text"><a href="${escHtml(s.link || '')}" target="_blank" rel="noopener">${escHtml(s.link || '')}</a></div>
-        ${s.notes ? `<div style="font-size:11px;color:var(--text-dim);margin-top:6px;">📝 ${escHtml(s.notes)}</div>` : ''}
-        <div class="figma-meta">Submitted at ${s.submittedAt || ''} &nbsp;·&nbsp; Last updated: ${s.updatedAt || ''}</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;">
-        <a href="${escHtml(s.link || '')}" target="_blank" rel="noopener"
-           style="padding:8px 14px;background:var(--blue);color:#fff;border:2px solid #000;font-family:'Space Mono';font-size:10px;font-weight:700;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-          🔗 Open
-        </a>
-        <button class="btn-action" style="font-size:10px;padding:8px 14px;" onclick="removeTechEntry(${i})">✕ Remove</button>
-      </div>
+      ${s.zipFileName ? `<div style="font-family:'Space Mono';font-size:10px;color:#555;padding:6px 10px;background:#0a0a0a;border:1px dashed #222;">📦 ZIP: ${escHtml(s.zipFileName)}</div>` : ''}
     </div>
   `).join('');
 }
 
+function downloadTechZip(index) {
+  const s = techSubmissions[index];
+  if (!s || !s.zipData) { alert('No ZIP file data stored for this entry.'); return; }
+  const byteStr = atob(s.zipData);
+  const buf = new ArrayBuffer(byteStr.length);
+  const view = new Uint8Array(buf);
+  for (let i = 0; i < byteStr.length; i++) view[i] = byteStr.charCodeAt(i);
+  const blob = new Blob([buf], { type: 'application/zip' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = s.zipFileName || 'submission.zip'; a.click();
+}
+
 function removeTechEntry(index) {
-  // Use the local array to find which entry to remove, then remove from Firebase by key
+  if (!confirm('Delete this submission?')) return;
   const target = techSubmissions[index];
   if (!target) return;
   database.ref('techSubmissions').once('value').then(snap => {
@@ -2244,7 +2561,7 @@ function removeTechEntry(index) {
     if (matchKey) database.ref('techSubmissions/' + matchKey).remove();
     else { techSubmissions.splice(index, 1); database.ref('techSubmissions').set(techSubmissions.length ? techSubmissions : null); }
   });
-  showSyncToast('Submission entry removed.');
+  showSyncToast('🗑 Submission deleted.');
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2774,11 +3091,17 @@ database.ref('techSubmissions').on('value', snapshot => {
   renderAdminTechVault();
 });
 
-database.ref('timeInSeconds').on('value', snapshot => {
+database.ref('hackathonEndsAt').on('value', snapshot => {
   const val = snapshot.val();
-  if (val !== null) {
-    timeInSeconds = val;
+  if (val) {
+    hackathonEndsAt = val;
+    timeInSeconds = Math.max(0, Math.round((new Date(hackathonEndsAt) - Date.now()) / 1000));
     renderChronometerDisplays();
+    updateTimerEndLabel();
+  } else {
+    if (activeAdminUser) {
+      setTimerFromSeconds(72 * 3600);
+    }
   }
 });
 
