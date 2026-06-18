@@ -2194,6 +2194,9 @@ function executeFinalPublishChain() {
     teamId: tId,
     time:new Date().toLocaleTimeString(),
     htmlLength:document.getElementById("editorIndex").value.length,
+    editorHtml: document.getElementById("editorIndex")?.value || '',
+    editorCss:  document.getElementById("editorStyle")?.value  || '',
+    editorJs:   document.getElementById("editorJs")?.value     || '',
     driveVideo: (document.getElementById("codeDriveVideo")?.value || '').trim(),
     drivePpt: (document.getElementById("codeDrivePpt")?.value || '').trim(),
     zipFileName: zipMeta ? zipMeta.name : '',
@@ -2215,6 +2218,7 @@ function renderAdminZipRepository() {
     return;
   }
   loggedSubmissionsZip.forEach((a, i) => {
+    const hasEditorCode = a.editorHtml || a.editorCss || a.editorJs;
     const el = document.createElement("div"); el.className = "zip-item";
     el.style.flexDirection = 'column'; el.style.gap = '10px';
     el.innerHTML = `
@@ -2222,9 +2226,11 @@ function renderAdminZipRepository() {
         <div>
           <span style="color:var(--accent);font-weight:700;font-family:'Space Mono';">📦 ${escHtml(a.fileName || '')}</span>
           <div style="font-size:11px;color:var(--text-dim);margin-top:2px;font-family:'Space Mono';">By ${escHtml(a.teamName||'')} · Submitted ${escHtml(a.time||'')}</div>
+          ${hasEditorCode ? `<div style="font-size:10px;color:#555;margin-top:3px;font-family:'Space Mono';">HTML: ${(a.editorHtml||'').length} chars · CSS: ${(a.editorCss||'').length} chars · JS: ${(a.editorJs||'').length} chars</div>` : ''}
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          ${a.zipData ? `<button class="btn-accent-sm" style="font-size:10px;padding:8px 14px;" onclick="downloadZipFromBase64('${escHtml(a.fileName||'')}', '${i}', 'zip')">⬇ Download ZIP</button>` : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          ${hasEditorCode ? `<button class="btn-accent-sm" style="font-size:10px;padding:8px 14px;background:#0d2a1a;color:var(--accent);border-color:var(--accent);" onclick="downloadCodeAsZip(${i})">⬇ Download Code ZIP</button>` : ''}
+          ${a.zipData ? `<button class="btn-accent-sm" style="font-size:10px;padding:8px 14px;" onclick="downloadZipFromBase64('${escHtml(a.fileName||'')}', '${i}', 'zip')">⬇ Uploaded ZIP</button>` : ''}
           ${a.driveVideo ? `<a href="${escHtml(a.driveVideo)}" target="_blank" class="btn-action" style="font-size:10px;padding:8px 14px;text-decoration:none;">📹 Video</a>` : ''}
           ${a.drivePpt ? `<a href="${escHtml(a.drivePpt)}" target="_blank" class="btn-action" style="font-size:10px;padding:8px 14px;text-decoration:none;">📊 PPT</a>` : ''}
           <button class="btn-action" style="font-size:10px;padding:8px 14px;color:var(--red);border-color:var(--red);" onclick="deleteZipEntry(${i})">✕ Delete</button>
@@ -2236,7 +2242,131 @@ function renderAdminZipRepository() {
   if(badge) badge.textContent = loggedSubmissionsZip.length + ' Submission' + (loggedSubmissionsZip.length !== 1 ? 's' : '');
 }
 
-/* ══ ZIP DOWNLOAD FROM BASE64 ══ */
+/* ══ DOWNLOAD EDITOR CODE AS ZIP ══ */
+function downloadCodeAsZip(idx) {
+  const item = loggedSubmissionsZip[idx];
+  if (!item) { alert('Submission not found.'); return; }
+
+  const html = item.editorHtml || '';
+  const css  = item.editorCss  || '';
+  const js   = item.editorJs   || '';
+  const teamSlug = (item.teamName || 'team').replace(/\s+/g, '_');
+
+  // Build a minimal ZIP manually (PKZIP local file headers + central directory)
+  function strToBytes(str) {
+    const enc = new TextEncoder();
+    return enc.encode(str);
+  }
+
+  function crc32(bytes) {
+    let c = 0xFFFFFFFF;
+    const table = [];
+    for (let i = 0; i < 256; i++) {
+      let v = i;
+      for (let j = 0; j < 8; j++) v = (v & 1) ? (0xEDB88320 ^ (v >>> 1)) : (v >>> 1);
+      table[i] = v;
+    }
+    for (let i = 0; i < bytes.length; i++) c = table[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  function u16(n) { return [n & 0xFF, (n >> 8) & 0xFF]; }
+  function u32(n) { return [n & 0xFF, (n >> 8) & 0xFF, (n >> 16) & 0xFF, (n >> 24) & 0xFF]; }
+
+  function makeEntry(name, content) {
+    const nameBytes = strToBytes(name);
+    const dataBytes = strToBytes(content);
+    const crc = crc32(dataBytes);
+    const now = new Date();
+    const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+    const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
+    const local = [
+      0x50, 0x4B, 0x03, 0x04, // signature
+      20, 0,                   // version needed
+      0, 0,                    // flags
+      0, 0,                    // compression (stored)
+      ...u16(dosTime), ...u16(dosDate),
+      ...u32(crc),
+      ...u32(dataBytes.length),
+      ...u32(dataBytes.length),
+      ...u16(nameBytes.length),
+      0, 0,                    // extra field length
+    ];
+    return { nameBytes, dataBytes, crc, local: new Uint8Array(local), dosDate, dosTime };
+  }
+
+  const files = [
+    { name: 'index.html', content: html },
+    { name: 'style.css',  content: css  },
+    { name: 'js.js',      content: js   }
+  ];
+
+  const entries = files.map(f => makeEntry(f.name, f.content));
+
+  // Calculate total size
+  let offset = 0;
+  const offsets = [];
+  const parts = [];
+
+  entries.forEach(e => {
+    offsets.push(offset);
+    const localFull = new Uint8Array([...e.local, ...e.nameBytes, ...e.dataBytes]);
+    parts.push(localFull);
+    offset += localFull.length;
+  });
+
+  const centralDirStart = offset;
+
+  // Central directory
+  const centralParts = entries.map((e, i) => {
+    const cd = [
+      0x50, 0x4B, 0x01, 0x02, // signature
+      20, 0,                   // version made by
+      20, 0,                   // version needed
+      0, 0,                    // flags
+      0, 0,                    // compression
+      ...u16(e.dosTime), ...u16(e.dosDate),
+      ...u32(e.crc),
+      ...u32(e.dataBytes.length),
+      ...u32(e.dataBytes.length),
+      ...u16(e.nameBytes.length),
+      0, 0,                    // extra field length
+      0, 0,                    // comment length
+      0, 0,                    // disk number start
+      0, 0,                    // internal attributes
+      0, 0, 0, 0,              // external attributes
+      ...u32(offsets[i]),      // relative offset
+    ];
+    return new Uint8Array([...cd, ...e.nameBytes]);
+  });
+
+  const centralDirSize = centralParts.reduce((s, p) => s + p.length, 0);
+  const eocd = [
+    0x50, 0x4B, 0x05, 0x06, // signature
+    0, 0,                    // disk number
+    0, 0,                    // disk with central dir
+    ...u16(entries.length),
+    ...u16(entries.length),
+    ...u32(centralDirSize),
+    ...u32(centralDirStart),
+    0, 0                     // comment length
+  ];
+
+  const allParts = [...parts, ...centralParts, new Uint8Array(eocd)];
+  const totalLen = allParts.reduce((s, p) => s + p.length, 0);
+  const zipBuffer = new Uint8Array(totalLen);
+  let pos = 0;
+  allParts.forEach(p => { zipBuffer.set(p, pos); pos += p.length; });
+
+  const blob = new Blob([zipBuffer], { type: 'application/zip' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${teamSlug}_ID_${item.teamId || '00000'}_Code.zip`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+
 function downloadZipFromBase64(fileName, idx, type) {
   let item;
   if (type === 'zip') item = loggedSubmissionsZip[idx];
